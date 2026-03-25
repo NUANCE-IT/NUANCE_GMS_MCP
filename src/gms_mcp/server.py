@@ -40,8 +40,8 @@ import sys
 from typing import Annotated, Optional
 
 import numpy as np
+from fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from fastmcp import FastMCP, Context
 
 # ---------------------------------------------------------------------------
 # DM import with automatic simulation fallback
@@ -51,7 +51,7 @@ _SIMULATE = os.environ.get("GMS_SIMULATE", "0") != "0"
 
 if not _SIMULATE:
     try:
-        import DigitalMicrograph as DM  # type: ignore
+        import DigitalMicrograph as DM
         _SIMULATE = False
     except ImportError:
         _SIMULATE = True
@@ -531,13 +531,13 @@ def gms_acquire_4d_stem(params: Acquire4DSTEMInput) -> str:
         # In simulation: generate a synthetic 4D array and register as front image.
         if _SIMULATE:
             det_x, det_y = 64, 64
-            raw4d = DM._make_4d_stem(  # type: ignore[attr-defined]
+            raw4d = DM._make_4d_stem(
                 params.scan_x, params.scan_y, det_x, det_y
             )
             # Register the simulated 4D dataset as the active front image
             # so that gms_run_4dstem_analysis can retrieve it.
-            DM._front_image = raw4d                           # type: ignore[attr-defined]
-            DM._images[raw4d.GetID()] = raw4d                 # type: ignore[attr-defined]
+            DM._front_image = raw4d
+            DM._images[raw4d.GetID()] = raw4d
             data4d = raw4d
             det_shape = [det_y, det_x]
         else:
@@ -726,7 +726,7 @@ def gms_acquire_diffraction(params: AcquireDiffractionInput) -> str:
                            for ri in range(r_max)])
 
         # Find peaks in radial profile (crude, works for simulation)
-        from scipy.signal import find_peaks  # type: ignore[import-untyped]
+        from scipy.signal import find_peaks
         peaks, _ = find_peaks(radial, height=radial.mean() * 1.5,
                                distance=10)
 
@@ -892,7 +892,7 @@ def gms_set_beam_parameters(
     Returns JSON confirming the applied settings.
     """
     try:
-        direct_kwargs = {
+        direct_kwargs: dict[str, object] = {
             "spot_size": spot_size,
             "focus_um": focus_um,
             "shift_x": shift_x,
@@ -910,7 +910,7 @@ def gms_set_beam_parameters(
             merged.update({k: v for k, v in direct_kwargs.items() if v is not None})
             params = SetBeamInput(**merged)
 
-        applied = {}
+        applied: dict[str, object] = {}
         if params.spot_size is not None:
             DM.EMSetSpotSize(params.spot_size)
             applied["spot_size"] = params.spot_size
@@ -971,7 +971,7 @@ def gms_configure_detectors(params: SetDetectorInput) -> str:
     """
     try:
         camera = DM.CM_GetCurrentCamera()
-        applied = {}
+        applied: dict[str, object] = {}
 
         if params.insert_camera is not None:
             DM.CM_SetCameraInserted(camera, int(params.insert_camera))

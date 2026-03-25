@@ -20,8 +20,6 @@ Usage (automatic, inside gms_mcp_server.py):
 from __future__ import annotations
 
 import base64
-import math
-import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -328,7 +326,6 @@ class DMSimulator:
         data = np.zeros((scan_y, scan_x, det_y, det_x), dtype=np.float32)
         cx, cy = det_x // 2, det_y // 2
         yy, xx = np.ogrid[:det_y, :det_x]
-        base_disk = np.exp(-((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * 5 ** 2))
         for iy in range(scan_y):
             for ix in range(scan_x):
                 shift_x = (ix - scan_x / 2) * 0.3
@@ -345,6 +342,8 @@ class DMSimulator:
     # ------------------------------------------------------------------
 
     def GetFrontImage(self) -> SimImage:
+        if self._front_image is None:
+            self._front_image = self._make_hrtem_image(1024, 1024)
         return self._front_image
 
     def FindImageByName(self, name: str) -> SimImage | None:

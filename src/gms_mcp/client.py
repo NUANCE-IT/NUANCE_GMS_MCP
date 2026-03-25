@@ -45,13 +45,12 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 # LangChain + MCP
-from langchain_ollama import ChatOllama
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_ollama import ChatOllama
 from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -196,7 +195,7 @@ async def run_agent(
                 if verbose:
                     print(f"[TOOL] {tc['name']}({json.dumps(tc['args'], indent=2)})")
         if isinstance(msg, AIMessage) and msg.content and not getattr(msg, "tool_calls", []):
-            final_answer = msg.content
+            final_answer = str(msg.content)
             if verbose:
                 print(f"\n[AGENT] {final_answer}\n")
 
