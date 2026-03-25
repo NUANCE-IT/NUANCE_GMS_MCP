@@ -424,7 +424,14 @@ def gms_acquire_tem_image(params: AcquireTEMInput) -> str:
     annotations={"readOnlyHint": False, "destructiveHint": False,
                  "idempotentHint": False, "openWorldHint": False},
 )
-def gms_acquire_stem(params: AcquireSTEMInput) -> str:
+def gms_acquire_stem(
+    params: Optional[AcquireSTEMInput] = None,
+    width: int = 512,
+    height: int = 512,
+    dwell_us: float = 10.0,
+    rotation_deg: float = 0.0,
+    signals: Optional[list[int]] = None,
+) -> str:
     """
     Acquire a STEM image (HAADF, BF, ABF) using DigiScan.
 
@@ -439,6 +446,14 @@ def gms_acquire_stem(params: AcquireSTEMInput) -> str:
     Returns JSON with image statistics and scan metadata.
     """
     try:
+        if params is None:
+            params = AcquireSTEMInput(
+                width=width,
+                height=height,
+                dwell_us=dwell_us,
+                rotation_deg=rotation_deg,
+                signals=[0, 1] if signals is None else signals,
+            )
         DM.DSSetFrameSize(params.width, params.height)
         DM.DSSetPixelTime(params.dwell_us)
         DM.DSSetRotation(params.rotation_deg)
@@ -570,7 +585,14 @@ def gms_acquire_4d_stem(params: Acquire4DSTEMInput) -> str:
     annotations={"readOnlyHint": False, "destructiveHint": False,
                  "idempotentHint": False, "openWorldHint": False},
 )
-def gms_acquire_eels(params: AcquireEELSInput) -> str:
+def gms_acquire_eels(
+    params: Optional[AcquireEELSInput] = None,
+    exposure_s: float = 1.0,
+    energy_offset_eV: float = 0.0,
+    slit_width_eV: float = 10.0,
+    dispersion_idx: int = 0,
+    full_vertical_binning: bool = True,
+) -> str:
     """
     Acquire an EELS spectrum from the GIF (Gatan Imaging Filter).
 
@@ -588,6 +610,15 @@ def gms_acquire_eels(params: AcquireEELSInput) -> str:
     zero-loss peak position estimate, and acquisition metadata.
     """
     try:
+        if params is None:
+            params = AcquireEELSInput(
+                exposure_s=exposure_s,
+                energy_offset_eV=energy_offset_eV,
+                slit_width_eV=slit_width_eV,
+                dispersion_idx=dispersion_idx,
+                full_vertical_binning=full_vertical_binning,
+            )
+
         # Configure GIF / spectrometer
         DM.IFSetEELSMode()
         DM.IFCSetEnergy(params.energy_offset_eV)
@@ -832,7 +863,17 @@ def gms_set_stage_position(params: SetStageInput) -> str:
     annotations={"readOnlyHint": False, "destructiveHint": False,
                  "idempotentHint": True, "openWorldHint": False},
 )
-def gms_set_beam_parameters(params: SetBeamInput) -> str:
+def gms_set_beam_parameters(
+    params: Optional[SetBeamInput] = None,
+    spot_size: Optional[int] = None,
+    focus_um: Optional[float] = None,
+    shift_x: Optional[float] = None,
+    shift_y: Optional[float] = None,
+    tilt_x: Optional[float] = None,
+    tilt_y: Optional[float] = None,
+    obj_stig_x: Optional[float] = None,
+    obj_stig_y: Optional[float] = None,
+) -> str:
     """
     Configure beam/optics parameters.
 
@@ -845,9 +886,30 @@ def gms_set_beam_parameters(params: SetBeamInput) -> str:
         params.tilt_x/y    (float) : Beam tilt in radians.
         params.obj_stig_x/y(float) : Objective stigmator values.
 
+        The same fields can also be passed directly as top-level kwargs
+        (e.g. `spot_size=4`) for compatibility with some LLM tool clients.
+
     Returns JSON confirming the applied settings.
     """
     try:
+        direct_kwargs = {
+            "spot_size": spot_size,
+            "focus_um": focus_um,
+            "shift_x": shift_x,
+            "shift_y": shift_y,
+            "tilt_x": tilt_x,
+            "tilt_y": tilt_y,
+            "obj_stig_x": obj_stig_x,
+            "obj_stig_y": obj_stig_y,
+        }
+
+        if params is None:
+            params = SetBeamInput(**{k: v for k, v in direct_kwargs.items() if v is not None})
+        elif any(v is not None for v in direct_kwargs.values()):
+            merged = params.model_dump(exclude_none=True)
+            merged.update({k: v for k, v in direct_kwargs.items() if v is not None})
+            params = SetBeamInput(**merged)
+
         applied = {}
         if params.spot_size is not None:
             DM.EMSetSpotSize(params.spot_size)

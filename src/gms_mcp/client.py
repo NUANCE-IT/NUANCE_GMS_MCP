@@ -58,7 +58,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 # ---------------------------------------------------------------------------
 
 _HERE = Path(__file__).parent.resolve()
-_SERVER_SCRIPT = str(_HERE / "gms_mcp_server.py")
+_SERVER_SCRIPT = str(_HERE / "server.py")
 
 DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
 DEFAULT_OLLAMA_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")

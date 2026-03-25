@@ -15,23 +15,19 @@ GMS-MCP connects **Gatan Microscopy Suite (GMS) 3.60** to any MCP-compatible LLM
 
 ## Highlights
 
-| Feature | GMS-MCP | TEM Agent (LBNL, 2025) |
-|---|:---:|:---:|
-| Instrument API | Gatan DigitalMicrograph / GMS 3.60 | ThermoFisher TEMScripting |
-| LLM backend | **Local Ollama** (air-gap safe) | Cloud Claude API |
-| Data sovereignty | ✅ stays on-site | ❌ reaches API servers |
-| TEM / HRTEM | ✅ | ✅ |
-| STEM (HAADF / BF / ABF) | ✅ | ✅ |
-| 4D-STEM / NBED | ✅ full N×N×det² | ⚠️ partial |
-| 4D-STEM analysis (vBF, CoM, DPC) | ✅ built-in | ❌ |
-| EELS / EDS spectrum imaging | ✅ full GIF/IFC | ❌ |
-| Electron diffraction + d-spacings | ✅ auto ring detection | ❌ |
-| Automated tilt series | ✅ ±80°, configurable | ✅ 0–20°, fixed |
-| Pydantic v2 input validation | ✅ physical bounds | ❌ |
-| Physics-plausible simulator | ✅ DMSimulator | ❌ |
-| Regression test suite | ✅ 49 tests | ❌ |
-| Transport | stdio + Streamable HTTP | stdio only |
-| License | MIT | TBD |
+| Capability | Details |
+|---|---|
+| Instrument API | Gatan DigitalMicrograph / GMS 3.60 |
+| LLM backend | Local Ollama (air-gap compatible) |
+| Data handling | On-site, local-first workflow |
+| Modalities | TEM / HRTEM, STEM (HAADF/BF/ABF), 4D-STEM / NBED, EELS, diffraction |
+| Built-in analysis | Virtual BF/HAADF, CoM, DPC, ring detection and d-spacing estimation |
+| Automation | Stage control, beam/optics control, detector configuration, tilt series |
+| Validation | Pydantic v2 physical-bound checks on tool inputs |
+| Simulation | Physics-plausible DMSimulator for hardware-free development |
+| Testing | 55-test suite (49 hardware-independent + 6 Ollama integration) |
+| Transport | stdio + Streamable HTTP |
+| License | MIT |
 
 ---
 
@@ -219,7 +215,7 @@ gms-mcp/
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE                       # MIT, Roberto dos Reis & Vinayak P. Dravid
-├── README.md                     # badges, comparison table, quick-start
+├── README.md                     # badges, highlights, quick-start
 ├── pyproject.toml                # packaging, ruff, mypy, pytest config
 ├── src/gms_mcp/
 │   ├── __init__.py               # version
