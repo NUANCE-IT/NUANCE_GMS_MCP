@@ -1,8 +1,8 @@
 # GMS-MCP 🔬
 
 [![arXiv](https://img.shields.io/badge/arXiv-2025.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2025.XXXXX)
-[![Tests](https://github.com/rmsreis/gms-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rmsreis/gms-mcp/actions/workflows/ci.yml)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://github.com/NUANCE-IT/Gatan_MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/NUANCE-IT/Gatan_MCP/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Northwestern NUANCE](https://img.shields.io/badge/NUANCE-Northwestern-4E2A84.svg)](https://www.nuance.northwestern.edu)
@@ -64,7 +64,7 @@ pip install "gms-mcp[ollama]"
 pip install "gms-mcp[ollama,zmq]"
 
 # Full development install
-git clone https://github.com/rmsreis/gms-mcp
+git clone https://github.com/NUANCE-IT/Gatan_MCP
 cd gms-mcp
 pip install -e ".[all]"
 ```

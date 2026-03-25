@@ -22,7 +22,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -30,7 +29,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "fastmcp>=3.1.0",
     "mcp[cli]>=1.0.0",
@@ -107,7 +106,7 @@ ignore = [
 
 # ── Mypy ────────────────────────────────────────────────────────────────────
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = false
 ignore_missing_imports = true
 warn_unused_ignores = true
