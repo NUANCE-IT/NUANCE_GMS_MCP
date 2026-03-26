@@ -267,7 +267,8 @@ Gatan_MCP/
 │   ├── 04_4dstem_analysis.py
 │   ├── 05_tilt_series.py
 │   ├── 06_diffraction_dspacing.py
-│   └── 07_voice_acquisition.py
+│   ├── 07_voice_acquisition.py
+│   └── 08_voice_confirmed_stage_moves.py
 ├── docs/
 │   ├── index.md
 │   ├── installation.md
