@@ -9,7 +9,7 @@ Demonstrates:
 - Optional spoken reply output
 
 Run:
-    pip install "gms-mcp[ollama,voice]"
+    pip install "nuance-gms-mcp[ollama,voice]"
     GMS_SIMULATE=1 python examples/08_voice_confirmed_stage_moves.py
     GMS_SIMULATE=1 python examples/08_voice_confirmed_stage_moves.py --speak
 

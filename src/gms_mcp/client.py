@@ -127,7 +127,7 @@ def _import_ollama_stack() -> tuple[Any, Any, Any, Any, Any]:
     except ImportError as exc:
         raise RuntimeError(
             "Ollama client support requires optional dependencies. Install with: "
-            'pip install "gms-mcp[ollama]"'
+            'pip install "nuance-gms-mcp[ollama]"'
         ) from exc
 
     return AIMessage, HumanMessage, MultiServerMCPClient, create_react_agent, ChatOllama

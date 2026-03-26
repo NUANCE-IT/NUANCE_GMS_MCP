@@ -31,7 +31,7 @@ def _import_sounddevice():
     except ImportError as exc:
         raise VoiceDependencyError(
             "Microphone capture requires 'sounddevice'. Install with: "
-            'pip install "gms-mcp[voice]"'
+            'pip install "nuance-gms-mcp[voice]"'
         ) from exc
     return sd
 
@@ -42,7 +42,7 @@ def _import_whisper_model():
     except ImportError as exc:
         raise VoiceDependencyError(
             "Local transcription requires 'faster-whisper'. Install with: "
-            'pip install "gms-mcp[voice]"'
+            'pip install "nuance-gms-mcp[voice]"'
         ) from exc
     return WhisperModel
 

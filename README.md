@@ -54,24 +54,33 @@ The **DMSimulator** activates automatically when `DigitalMicrograph` is unavaila
 
 ### 1. Install
 
+Published release from PyPI:
+
 ```bash
 # Core server only
-pip install gms-mcp
+pip install nuance-gms-mcp
 
 # With Ollama client support
-pip install "gms-mcp[ollama]"
+pip install "nuance-gms-mcp[ollama]"
 
 # With local voice control (microphone + Whisper transcription)
-pip install "gms-mcp[ollama,voice]"
+pip install "nuance-gms-mcp[ollama,voice]"
 
 # With ZeroMQ bridge for live GMS connection
-pip install "gms-mcp[ollama,zmq]"
+pip install "nuance-gms-mcp[ollama,zmq]"
 
-# Full development install
+# Install the latest code from this repository instead of the published PyPI release
+pip install "git+https://github.com/NUANCE-IT/Gatan_MCP.git"
+
+# Full development install from a local clone
 git clone https://github.com/NUANCE-IT/Gatan_MCP
 cd Gatan_MCP
 pip install -e ".[all]"
 ```
+
+Use `pip install nuance-gms-mcp` when you want the published release from PyPI.
+Use `pip install -e ".[all]"`, `pip install .`, or the direct GitHub URL when you
+want this repository's current source tree.
 
 ### 2. Install Ollama + pull a model
 

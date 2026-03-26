@@ -8,7 +8,7 @@ Demonstrates:
 - Optional spoken reply output
 
 Run:
-    pip install "gms-mcp[ollama,voice]"
+    pip install "nuance-gms-mcp[ollama,voice]"
     GMS_SIMULATE=1 python examples/07_voice_acquisition.py
     GMS_SIMULATE=1 python examples/07_voice_acquisition.py --speak
 

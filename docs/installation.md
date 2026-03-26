@@ -17,14 +17,26 @@
 
 Ideal for development, testing, and demonstrations on any workstation.
 
+Published release from PyPI:
+
 ```bash
-pip install "gms-mcp[ollama]"
+pip install "nuance-gms-mcp[ollama]"
 
 # Pull a model
 ollama pull qwen2.5:7b
 
 # Launch interactive session
 GMS_SIMULATE=1 python -m gms_mcp.client
+```
+
+If you want the current code from this repository instead of the published PyPI
+release, use one of these commands:
+
+```bash
+pip install "git+https://github.com/NUANCE-IT/Gatan_MCP.git"
+
+# or, from a local clone
+pip install -e ".[all]"
 ```
 
 ---
@@ -57,7 +69,7 @@ exec(open("C:/GMS_Scripts/dm_plugin.py").read())
 ### Step 3: Install GMS-MCP on your workstation
 
 ```bash
-pip install "gms-mcp[ollama,zmq]"
+pip install "nuance-gms-mcp[ollama,zmq]"
 ```
 
 ### Step 4: Connect
@@ -90,7 +102,7 @@ Voice mode adds push-to-talk microphone capture, local faster-whisper transcript
 and optional spoken replies while keeping the existing Ollama MCP workflow unchanged.
 
 ```bash
-pip install "gms-mcp[ollama,voice]"
+pip install "nuance-gms-mcp[ollama,voice]"
 
 # Start the voice-enabled interactive agent
 GMS_SIMULATE=1 python -m gms_mcp.client --voice
