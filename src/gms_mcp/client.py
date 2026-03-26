@@ -45,12 +45,7 @@ import json
 import os
 import sys
 from pathlib import Path
-
-# LangChain + MCP
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_ollama import ChatOllama
-from langgraph.prebuilt import create_react_agent
+from typing import Any
 
 from gms_mcp import voice as voice_io
 
@@ -123,8 +118,26 @@ def _build_mcp_connections(server_url: str = "") -> dict:
         }
 
 
-def _build_llm(model: str, base_url: str, temperature: float = 0.0) -> ChatOllama:
+def _import_ollama_stack() -> tuple[Any, Any, Any, Any, Any]:
+    try:
+        from langchain_core.messages import AIMessage, HumanMessage
+        from langchain_mcp_adapters.client import MultiServerMCPClient
+        from langchain_ollama import ChatOllama
+        from langgraph.prebuilt import create_react_agent
+    except ImportError as exc:
+        raise RuntimeError(
+            "Ollama client support requires optional dependencies. Install with: "
+            'pip install "gms-mcp[ollama]"'
+        ) from exc
+
+    return AIMessage, HumanMessage, MultiServerMCPClient, create_react_agent, ChatOllama
+
+
+def _build_llm(model: str, base_url: str, temperature: float = 0.0) -> Any:
     """Create a ChatOllama instance configured for tool-calling."""
+    _AIMessage, _HumanMessage, _MultiServerMCPClient, _create_react_agent, ChatOllama = (
+        _import_ollama_stack()
+    )
     return ChatOllama(
         model=model,
         base_url=base_url,
@@ -190,6 +203,9 @@ async def run_agent(
         "tool_calls"  : list — Tool calls made during the session.
         "messages"    : list — Full message history.
     """
+    AIMessage, HumanMessage, MultiServerMCPClient, create_react_agent, _ChatOllama = (
+        _import_ollama_stack()
+    )
     connections = _build_mcp_connections(server_url)
     llm = _build_llm(model, base_url)
 
@@ -261,6 +277,9 @@ async def interactive_session(
     The session maintains conversation history so the agent remembers
     previous actions (e.g. "now tilt to +30° and acquire another image").
     """
+    AIMessage, HumanMessage, MultiServerMCPClient, create_react_agent, _ChatOllama = (
+        _import_ollama_stack()
+    )
     connections = _build_mcp_connections(server_url)
     llm = _build_llm(model, base_url)
 
