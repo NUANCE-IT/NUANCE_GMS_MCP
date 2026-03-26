@@ -31,24 +31,24 @@ dependencies.
 ## Repository structure
 
 ```text
-gms-mcp/
+Gatan_MCP/
 ├── .github/workflows/ci.yml     # lint + typecheck + test matrix + build
 ├── .gitignore
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE                       # MIT, Roberto dos Reis & Vinayak P. Dravid
-├── README.md                     # badges, comparison table, quick-start
+├── README.md                     # badges, highlights, quick-start
 ├── pyproject.toml                # packaging, ruff, mypy, pytest config
 ├── src/gms_mcp/
 │   ├── __init__.py               # version
 │   ├── server.py                 # FastMCP server — 21 tools
 │   ├── simulator.py              # DMSimulator physics twin
 │   ├── client.py                 # Ollama ReAct agent
-│   └── dm_plugin.py              # ZeroMQ bridge (runs inside GMS) <- new
+│   └── dm_plugin.py              # ZeroMQ bridge with persistent live-job backend
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py               # session fixtures, GMS_SIMULATE=1
-│   └── test_gms_mcp.py          # 55 tests (49 hardware-free)
+│   └── test_gms_mcp.py           # 67 tests (61 hardware-free)
 ├── examples/
 │   ├── 01_basic_query.py
 │   ├── 02_tem_acquisition.py
@@ -57,12 +57,12 @@ gms-mcp/
 │   ├── 05_tilt_series.py
 │   └── 06_diffraction_dspacing.py
 └── docs/
-	├── index.md
-	├── installation.md
-	├── architecture.md           # ASCII diagram, data-flow walkthrough
-	├── tools_reference.md        # full API for all 21 tools
-	├── dm_api_reference.md       # DM Python quick reference
-	└── gms_live_setup.md         # microscope PC wiring guide
+    ├── index.md
+    ├── installation.md
+    ├── architecture.md           # ASCII diagram, data-flow walkthrough
+    ├── tools_reference.md        # full API for all 21 tools
+    ├── dm_api_reference.md       # DM Python quick reference
+    └── gms_live_setup.md         # microscope PC wiring guide
 ```
 
 ---

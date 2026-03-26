@@ -4,7 +4,7 @@
 
 | Component | Minimum | Recommended |
 |---|---|---|
-| Python | 3.9 | 3.12 |
+| Python | 3.10 | 3.12 |
 | RAM | 8 GB | 16 GB |
 | GPU (for Ollama) | None (CPU OK) | NVIDIA RTX 3080+ |
 | GMS version | 3.60 | 3.62 |
@@ -86,8 +86,8 @@ and enter the HTTPS URL shown by ngrok.
 ## Installing from source
 
 ```bash
-git clone https://github.com/rmsreis/gms-mcp
-cd gms-mcp
+git clone https://github.com/NUANCE-IT/Gatan_MCP
+cd Gatan_MCP
 pip install -e ".[all]"
 
 # Verify

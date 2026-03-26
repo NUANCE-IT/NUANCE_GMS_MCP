@@ -38,7 +38,7 @@ Ollama LLM (local, port 11434)
     ↕  LangChain ReAct agent
 MultiServerMCPClient
     ↕  stdio subprocess  OR  HTTP /mcp
-gms_mcp_server.py  (FastMCP 3.x)
+gms_mcp.server  (FastMCP 3.x)
     ↕  ZeroMQ TCP bridge
 DM Plugin  (inside GMS process)
     ↕  DigitalMicrograph Python API
@@ -65,7 +65,7 @@ pip install "gms-mcp[ollama,zmq]"
 
 # Full development install
 git clone https://github.com/NUANCE-IT/Gatan_MCP
-cd gms-mcp
+cd Gatan_MCP
 pip install -e ".[all]"
 ```
 
@@ -221,7 +221,7 @@ pytest tests/ -m "not ollama" --cov=gms_mcp --cov-report=html
 ## Project Structure
 
 ```
-gms-mcp/
+Gatan_MCP/
 ├── .github/workflows/ci.yml     # lint + typecheck + test matrix + build
 ├── .gitignore
 ├── CHANGELOG.md
