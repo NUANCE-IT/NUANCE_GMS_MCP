@@ -1,7 +1,7 @@
 # NUANCE-GMS-MCP 🔬
 
 [![arXiv](https://img.shields.io/badge/arXiv-2025.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2025.XXXXX)
-[![Tests](https://github.com/NUANCE-IT/Gatan_MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/NUANCE-IT/Gatan_MCP/actions/workflows/ci.yml)
+[![Tests](https://github.com/NUANCE-IT/NUANCE_GMS_MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/NUANCE-IT/NUANCE_GMS_MCP/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -26,7 +26,7 @@ GMS-MCP connects **Gatan Microscopy Suite (GMS) 3.60** to any MCP-compatible LLM
 | Automation | Stage control, beam/optics control, detector configuration, tilt series, persistent live-processing jobs |
 | Validation | Pydantic v2 physical-bound checks on tool inputs |
 | Simulation | Physics-plausible DMSimulator for hardware-free development |
-| Testing | 67-test suite (61 hardware-independent + 6 Ollama integration) |
+| Testing | 107-test suite (92 hardware-independent + 15 Ollama integration) |
 | Transport | stdio + Streamable HTTP + optional ZeroMQ live-job bridge |
 | License | MIT |
 
@@ -70,10 +70,10 @@ pip install "nuance-gms-mcp[ollama,voice]"
 pip install "nuance-gms-mcp[ollama,zmq]"
 
 # Install the latest code from this repository instead of the published PyPI release
-pip install "git+https://github.com/NUANCE-IT/Gatan_MCP.git"
+pip install "git+https://github.com/NUANCE-IT/NUANCE_GMS_MCP.git"
 
 # Full development install from a local clone
-git clone https://github.com/NUANCE-IT/Gatan_MCP
+git clone https://github.com/NUANCE-IT/NUANCE_GMS_MCP
 cd Gatan_MCP
 pip install -e ".[all]"
 ```
@@ -160,8 +160,8 @@ the DM bridge so long-running state stays aligned with the live GMS process.
 | `gms_acquire_tem_image` | Acquisition | TEM / HRTEM image with exposure, binning, ROI |
 | `gms_acquire_stem` | Acquisition | HAADF / BF / ABF STEM scan |
 | `gms_acquire_4d_stem` | Acquisition | Full 4D-STEM / NBED dataset |
-| `gms_acquire_eels` | Acquisition | EELS spectrum with GIF/IFC control |
-| `gms_acquire_diffraction` | Acquisition | Electron diffraction + auto d-spacing extraction |
+| `gms_acquire_eels` | Acquisition | EELS spectrum (bridge mode for live GIF/IFC control; simulator supports direct path) |
+| `gms_acquire_diffraction` | Acquisition | Electron diffraction + auto d-spacing extraction (camera-length setting via bridge/microscope UI on live DM) |
 | `gms_apply_image_filter` | Analysis | Median / Gaussian filtering on the front image or ROI |
 | `gms_compute_radial_profile` | Analysis | 1D radial profile from diffraction or HRTEM FFT |
 | `gms_compute_max_fft` | Analysis | Max-FFT map over local windows in the front image |
@@ -172,12 +172,22 @@ the DM bridge so long-running state stays aligned with the live GMS process.
 | `gms_get_stage_position` | Stage | Read X, Y, Z, α, β |
 | `gms_set_stage_position` | Stage | Move stage (validated bounds) |
 | `gms_set_beam_parameters` | Optics | Spot size, focus, beam shift/tilt, stigmators |
-| `gms_configure_detectors` | Detectors | Insert/retract camera, CCD temp, HAADF/BF/ABF |
+| `gms_configure_detectors` | Detectors | Camera insert/retract + detector settings (some live DM controls require bridge mode) |
 | `gms_acquire_tilt_series` | Workflow | Automated tomographic tilt series |
 | `gms_run_4dstem_analysis` | Analysis | Virtual BF/HAADF, CoM, DPC maps |
 | `gms_run_4dstem_maximum_spot_mapping` | Analysis | Color maximum-spot map from a 4D-STEM dataset |
 
 All tools enforce **physical parameter bounds** via Pydantic v2 before any hardware command is issued.
+
+### DigitalMicrograph PythonReference Notes (Live Hardware)
+
+Recent updates align live-mode calls with the DigitalMicrograph PythonReference API. Some controls are not exposed directly in that API and therefore require the ZeroMQ bridge (`GMS_MCP_ZMQ`) to a DM-script/plugin context.
+
+- Live EELS GIF/IFC control is bridge-recommended.
+- Some detector controls (for example global DS signal toggles and CCD target temperature) are bridge-recommended.
+- Setting camera length programmatically is bridge-recommended for live DM sessions.
+
+When these operations are unavailable in direct Python mode, tool responses return structured `UNSUPPORTED` guidance rather than failing silently.
 
 ---
 
@@ -228,23 +238,22 @@ Agent: [calls gms_set_stage_position with alpha_deg=-60.0]
 
 ```bash
 # All hardware-independent tests (~18 s)
-pytest tests/ -v -m "not ollama"
+/Users/robertoreis/Documents/codes/Gatan_MCP/.venv/bin/python -m pytest tests/ -v -m "not ollama"
 
 # Full suite including Ollama end-to-end tests
-OLLAMA_MODEL=qwen2.5:7b pytest tests/ -v
+OLLAMA_MODEL=qwen2.5:7b /Users/robertoreis/Documents/codes/Gatan_MCP/.venv/bin/python -m pytest tests/ -v
 
 # With coverage
-pytest tests/ -m "not ollama" --cov=gms_mcp --cov-report=html
+/Users/robertoreis/Documents/codes/Gatan_MCP/.venv/bin/python -m pytest tests/ -m "not ollama" --cov=gms_mcp --cov-report=html
 ```
 
 **Test suite summary:**
 
-| Class | Tests | Hardware required |
+| Scope | Tests | Requirement |
 |---|---|---|
-| `TestDMSimulator` | 17 | None |
-| `TestMCPServerTools` | 39 | None |
-| `TestServerTransport` | 4 | None |
-| `TestOllamaIntegration` | 6 | Ollama + model |
+| Hardware-independent | 92 | None |
+| Ollama integration | 15 | Ollama + model |
+| Total | 107 | Local Python environment |
 
 ---
 

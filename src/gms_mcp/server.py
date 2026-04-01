@@ -1230,48 +1230,103 @@ def gms_get_microscope_state() -> str:
             result["simulation_mode"] = False
             return json.dumps(result, indent=2)
 
-        camera = DM.CM_GetCurrentCamera()
-        cam_name = DM.CM_GetCameraName(camera)
-        cam_inserted = DM.CM_GetCameraInserted(camera)
-        cam_temp = DM.CM_GetActualTemperature_C(camera)
+        if _SIMULATE:
+            camera = DM.CM_GetCurrentCamera()
+            cam_name = DM.CM_GetCameraName(camera)
+            cam_inserted = DM.CM_GetCameraInserted(camera)
+            cam_temp = DM.CM_GetActualTemperature_C(camera)
+            shift_xy = DM.EMGetBeamShift(0.0, 0.0)
+            result = {
+                "success": True,
+                "simulation_mode": True,
+                "runtime_mode": _runtime_mode(),
+                "optics": {
+                    "high_tension_kV": DM.EMGetHighTension() / 1000 if DM.EMCanGetHighTension() else None,
+                    "spot_size": DM.EMGetSpotSize(),
+                    "brightness": DM.EMGetBrightness(),
+                    "focus_um": DM.EMGetFocus(),
+                    "magnification": DM.EMGetMagnification() if DM.EMCanGetMagnification() else None,
+                    "mag_index": DM.EMGetMagIndex(),
+                    "operation_mode": DM.EMGetOperationMode(),
+                    "illumination_mode": DM.EMGetIlluminationMode(),
+                    "camera_length_mm": (DM.EMGetCameraLength() if DM.EMCanGetCameraLength() else None),
+                },
+                "stage": {
+                    "x_um": DM.EMGetStageX(),
+                    "y_um": DM.EMGetStageY(),
+                    "z_um": DM.EMGetStageZ(),
+                    "alpha_deg": DM.EMGetStageAlpha(),
+                    "beta_deg": DM.EMGetStageBeta(),
+                },
+                "beam": {
+                    "shift_x": shift_xy[0],
+                    "shift_y": shift_xy[1],
+                },
+                "eels": {
+                    "energy_offset_eV": DM.IFGetEnergyLoss(0),
+                    "slit_width_eV": DM.IFCGetSlitWidth(),
+                    "in_eels_mode": DM.IFIsInEELSMode(),
+                },
+                "camera": {
+                    "name": cam_name,
+                    "inserted": cam_inserted,
+                    "temp_c": cam_temp,
+                    "n_signals": DM.DSGetNumberOfSignals(),
+                },
+            }
+            return json.dumps(result, indent=2)
+
+        mic = DM.Py_Microscope()
+        camera = DM.GetActiveCamera()
+        cam_name = camera.GetName() if hasattr(camera, "GetName") else None
+        cam_inserted = camera.GetInserted() if hasattr(camera, "GetInserted") else None
+        cam_temp = None
+        try:
+            shift_x, shift_y = mic.GetBeamShift()
+        except Exception:
+            shift_x, shift_y = None, None
+        try:
+            cam_length = mic.GetCameraLength() if mic.CanGetCameraLength() else None
+        except Exception:
+            cam_length = None
 
         result = {
             "success": True,
-            "simulation_mode": _SIMULATE,
+            "simulation_mode": False,
             "runtime_mode": _runtime_mode(),
             "optics": {
-                "high_tension_kV": DM.EMGetHighTension() / 1000 if DM.EMCanGetHighTension() else None,
-                "spot_size":       DM.EMGetSpotSize(),
-                "brightness":      DM.EMGetBrightness(),
-                "focus_um":        DM.EMGetFocus(),
-                "magnification":   DM.EMGetMagnification() if DM.EMCanGetMagnification() else None,
-                "mag_index":       DM.EMGetMagIndex(),
-                "operation_mode":  DM.EMGetOperationMode(),
-                "illumination_mode": DM.EMGetIlluminationMode(),
-                "camera_length_mm": (DM.EMGetCameraLength()
-                                     if DM.EMCanGetCameraLength() else None),
+                "high_tension_kV": mic.GetHighTension() / 1000 if mic.CanGetHighTension() else None,
+                "spot_size": mic.GetSpotSize(),
+                "brightness": mic.GetBrightness(),
+                "focus_um": mic.GetFocus(),
+                "magnification": mic.GetMagnification() if mic.CanGetMagnification() else None,
+                "mag_index": mic.GetMagIndex(),
+                "operation_mode": mic.GetOperationMode(),
+                "illumination_mode": mic.GetIlluminationMode() if mic.CanGetIlluminationMode() else None,
+                "camera_length_mm": cam_length,
             },
             "stage": {
-                "x_um":      DM.EMGetStageX(),
-                "y_um":      DM.EMGetStageY(),
-                "z_um":      DM.EMGetStageZ(),
-                "alpha_deg": DM.EMGetStageAlpha(),
-                "beta_deg":  DM.EMGetStageBeta(),
+                "x_um": mic.GetStageX(),
+                "y_um": mic.GetStageY(),
+                "z_um": mic.GetStageZ(),
+                "alpha_deg": mic.GetStageAlpha(),
+                "beta_deg": mic.GetStageBeta(),
             },
             "beam": {
-                "shift_x": DM.EMGetBeamShift(0.0, 0.0)[0],
-                "shift_y": DM.EMGetBeamShift(0.0, 0.0)[1],
+                "shift_x": shift_x,
+                "shift_y": shift_y,
             },
             "eels": {
-                "energy_offset_eV": DM.IFGetEnergyLoss(0),
-                "slit_width_eV":    DM.IFCGetSlitWidth(),
-                "in_eels_mode":     DM.IFIsInEELSMode(),
+                "energy_offset_eV": None,
+                "slit_width_eV": None,
+                "in_eels_mode": None,
+                "note": "EELS/GIF IF/IFC APIs are unavailable in PythonReference; use bridge mode for live GIF control.",
             },
             "camera": {
-                "name":        cam_name,
-                "inserted":    cam_inserted,
-                "temp_c":      cam_temp,
-                "n_signals":   DM.DSGetNumberOfSignals(),
+                "name": cam_name,
+                "inserted": cam_inserted,
+                "temp_c": cam_temp,
+                "n_signals": DM.DS_CountSignals() if hasattr(DM, "DS_CountSignals") else None,
             },
         }
         return json.dumps(result, indent=2)
@@ -1320,13 +1375,7 @@ def gms_get_front_image(
         )}
         return json.dumps(result, indent=2)
     except Exception as e:
-        import traceback
-        import sys
-        print("[gms_get_front_image] Exception:", file=sys.stderr)
-        traceback.print_exc()
-        error = _build_error(str(e), "Ensure a front-most image is available in GMS.")
-        print("[gms_get_front_image] Error structure:", error, file=sys.stderr)
-        return error
+        return _build_error(str(e), "Ensure a front-most image is available in GMS.")
 
 
 # ---------------------------------------------------------------------------
@@ -1953,16 +2002,43 @@ def gms_acquire_tem_image(
 
         if _SIMULATE and hasattr(DM, "_state"):
             DM._state.operation_mode = "TEM"
-        camera = DM.CM_GetCurrentCamera()
-        acq = DM.CM_CreateAcquisitionParameters_FullCCD(
-            camera, params.processing, params.exposure_s,
-            params.binning, params.binning
-        )
-        if params.roi:
-            DM.CM_SetCCDReadArea(acq, *params.roi)
 
-        DM.CM_Validate_AcquisitionParameters(camera, acq)
-        img = DM.CM_AcquireImage(camera, acq)
+        # Prefer PythonReference camera API on real instruments; keep legacy
+        # CM_* simulator path for hardware-free tests.
+        if _SIMULATE and hasattr(DM, "CM_GetCurrentCamera"):
+            camera = DM.CM_GetCurrentCamera()
+            acq = DM.CM_CreateAcquisitionParameters_FullCCD(
+                camera, params.processing, params.exposure_s,
+                params.binning, params.binning
+            )
+            if params.roi:
+                DM.CM_SetCCDReadArea(acq, *params.roi)
+            DM.CM_Validate_AcquisitionParameters(camera, acq)
+            img = DM.CM_AcquireImage(camera, acq)
+        else:
+            camera = DM.GetActiveCamera()
+            if hasattr(camera, "PrepareForAcquire"):
+                camera.PrepareForAcquire()
+            if params.roi:
+                t, l, b, r = params.roi
+                img = camera.AcquireImage(
+                    params.exposure_s,
+                    params.binning,
+                    params.binning,
+                    params.processing,
+                    t,
+                    l,
+                    b,
+                    r,
+                )
+            else:
+                img = camera.AcquireImage(
+                    params.exposure_s,
+                    params.binning,
+                    params.binning,
+                    params.processing,
+                )
+
         img.SetName(f"TEM_exp{params.exposure_s}s_bin{params.binning}")
 
         result = {"success": True, "acquisition_type": "TEM"}
@@ -2017,37 +2093,68 @@ def gms_acquire_stem(
             result = _run_bridge_tool("AcquireSTEM", params.model_dump())
             return json.dumps(result, indent=2)
 
-        DM.DSSetFrameSize(params.width, params.height)
-        DM.DSSetPixelTime(params.dwell_us)
-        DM.DSSetRotation(params.rotation_deg)
+        if _SIMULATE:
+            DM.DSSetFrameSize(params.width, params.height)
+            DM.DSSetPixelTime(params.dwell_us)
+            DM.DSSetRotation(params.rotation_deg)
 
-        n_signals = DM.DSGetNumberOfSignals()
-        for ch in range(n_signals):
-            DM.DSSetSignalEnabled(ch, 1 if ch in params.signals else 0)
+            n_signals = DM.DSGetNumberOfSignals()
+            for ch in range(n_signals):
+                DM.DSSetSignalEnabled(ch, 1 if ch in params.signals else 0)
 
-        DM.DSStartAcquisition()
-        DM.DSWaitUntilFinished()
+            DM.DSStartAcquisition()
+            DM.DSWaitUntilFinished()
+            img = DM.GetFrontImage()
+        else:
+            if not hasattr(DM, "DS_CreateParameters"):
+                return _build_error("DigiScan DS_* parameter API not available.", "Use bridge mode or ensure DigiScan Python API is installed.")
+            data_type_bytes = 4
+            param_id = DM.DS_CreateParameters(
+                params.width,
+                params.height,
+                0,
+                data_type_bytes,
+                float(params.rotation_deg),
+                float(params.dwell_us),
+                False,
+            )
+            enabled = set(int(ch) for ch in params.signals)
+            n_signals = DM.DS_CountSignals() if hasattr(DM, "DS_CountSignals") else 0
+            for ch in range(int(n_signals)):
+                DM.DS_SetParametersSignal(param_id, ch, float(data_type_bytes), ch in enabled, 0)
+            DM.DS_StartAcquisition(param_id, False, True)
+            img = None
+            try:
+                first_ch = int(params.signals[0]) if params.signals else 0
+                img_id = DM.DS_GetAcquiredImageID(first_ch)
+                if isinstance(img_id, (int, float)) and int(img_id) >= 0:
+                    img = DM.FindImageByID(int(img_id))
+            except Exception:
+                img = None
+            if img is None:
+                img = DM.GetFrontImage()
+            try:
+                DM.DS_DeleteParameters(param_id)
+            except Exception:
+                pass
 
-        img = DM.GetFrontImage()
         img.SetName(f"STEM_{params.width}x{params.height}_dwell{params.dwell_us}us")
 
-        # Annotate scan parameters in tags
         tags = img.GetTagGroup()
         tags.SetTagAsFloat("STEM:DwellTime_us", params.dwell_us)
         tags.SetTagAsFloat("STEM:Rotation_deg", params.rotation_deg)
-        tags.SetTagAsString("STEM:Signals",
-                            ",".join(map(str, params.signals)))
+        tags.SetTagAsString("STEM:Signals", ",".join(map(str, params.signals)))
 
         result = {
             "success": True,
             "acquisition_type": "STEM",
             "scan_parameters": {
-                "width": params.width, "height": params.height,
+                "width": params.width,
+                "height": params.height,
                 "dwell_us": params.dwell_us,
                 "rotation_deg": params.rotation_deg,
                 "signals_enabled": params.signals,
-                "total_frame_time_s": (params.width * params.height
-                                       * params.dwell_us * 1e-6),
+                "total_frame_time_s": (params.width * params.height * params.dwell_us * 1e-6),
             }
         }
         result.update(_image_to_response(img))
@@ -2105,9 +2212,15 @@ def gms_acquire_4d_stem(
             result = _run_bridge_tool("Acquire4DSTEM", params.model_dump())
             return json.dumps(result, indent=2)
 
-        if params.camera_length_mm is not None:
+        if params.camera_length_mm is not None and not _SIMULATE:
+            return _build_error(
+                "UNSUPPORTED: setting camera length is not exposed in PythonReference.",
+                "Set camera length in microscope controls (or bridge mode) before 4D-STEM acquisition.",
+            )
+        cl = None
+        if _SIMULATE and params.camera_length_mm is not None:
             DM.EMSetCameraLength(params.camera_length_mm)
-        cl = DM.EMGetCameraLength() if DM.EMCanGetCameraLength() else None
+            cl = DM.EMGetCameraLength() if DM.EMCanGetCameraLength() else None
 
         # In production: trigger 4D-STEM acquisition via STEMx / SI infrastructure.
         # In simulation: generate a synthetic 4D array and register as front image.
@@ -2205,7 +2318,13 @@ def gms_acquire_eels(
             result = _run_bridge_tool("AcquireEELS", params.model_dump())
             return json.dumps(result, indent=2)
 
-        # Configure GIF / spectrometer
+        if not _SIMULATE:
+            return _build_error(
+                "UNSUPPORTED: EELS/GIF control is not exposed in DigitalMicrograph PythonReference API.",
+                "Use bridge mode for live GIF control or read EELS metadata from acquired image tags.",
+            )
+
+        # Simulator path retains legacy GIF API behavior for hardware-free testing.
         DM.IFSetEELSMode()
         DM.IFCSetEnergy(params.energy_offset_eV)
         DM.IFCSetActiveDispersions(params.dispersion_idx)
@@ -2215,29 +2334,22 @@ def gms_acquire_eels(
         else:
             DM.IFCSetSlitIn(0)
 
-        # Acquire
         camera = DM.CM_GetCurrentCamera()
         acq = DM.CM_CreateAcquisitionParameters_FullCCD(
             camera, 3, params.exposure_s, 1, 1
         )
         if params.full_vertical_binning:
-            DM.CM_SetBinning(acq, 1, 2048)   # full vertical bin
+            DM.CM_SetBinning(acq, 1, 2048)
 
         DM.CM_Validate_AcquisitionParameters(camera, acq)
         spec_img = DM.CM_AcquireImage(camera, acq)
-        spec_img.SetName(f"EELS_dE{params.energy_offset_eV}eV_"
-                         f"exp{params.exposure_s}s")
+        spec_img.SetName(f"EELS_dE{params.energy_offset_eV}eV_exp{params.exposure_s}s")
 
         arr = spec_img.GetNumArray().flatten()
         n_ch = len(arr)
-
-        # Estimate energy calibration (dispersion ~ 0.1–1 eV/channel)
         dispersions = [0.1, 0.25, 0.5, 1.0]
         disp = dispersions[min(params.dispersion_idx, len(dispersions) - 1)]
-        energy_axis = (params.energy_offset_eV
-                       + np.arange(n_ch) * disp)
-
-        # Find approximate ZLP centre
+        energy_axis = params.energy_offset_eV + np.arange(n_ch) * disp
         zlp_idx = int(np.argmax(arr))
         zlp_energy = float(energy_axis[zlp_idx])
 
@@ -2245,16 +2357,15 @@ def gms_acquire_eels(
             "success": True,
             "acquisition_type": "EELS",
             "spectrum": {
-                "n_channels":          n_ch,
-                "energy_offset_eV":    params.energy_offset_eV,
-                "dispersion_eV_ch":    disp,
-                "energy_range_eV":     [float(energy_axis[0]),
-                                        float(energy_axis[-1])],
-                "zlp_centre_eV":       zlp_energy,
-                "zlp_channel":         zlp_idx,
-                "max_intensity":       float(arr.max()),
-                "slit_width_eV":       params.slit_width_eV,
-                "exposure_s":          params.exposure_s,
+                "n_channels": n_ch,
+                "energy_offset_eV": params.energy_offset_eV,
+                "dispersion_eV_ch": disp,
+                "energy_range_eV": [float(energy_axis[0]), float(energy_axis[-1])],
+                "zlp_centre_eV": zlp_energy,
+                "zlp_channel": zlp_idx,
+                "max_intensity": float(arr.max()),
+                "slit_width_eV": params.slit_width_eV,
+                "exposure_s": params.exposure_s,
             },
         }
         return json.dumps(result, indent=2)
@@ -2305,59 +2416,76 @@ def gms_acquire_diffraction(
             result = _run_bridge_tool("AcquireDiffraction", params.model_dump())
             return json.dumps(result, indent=2)
 
-        if params.camera_length_mm is not None:
-            DM.EMSetCameraLength(params.camera_length_mm)
-        cl = DM.EMGetCameraLength() if DM.EMCanGetCameraLength() else 100.0
-        previous_mode = None
-        if _SIMULATE and hasattr(DM, "_state"):
-            previous_mode = DM._state.operation_mode
-            DM._state.operation_mode = "DIFFRACTION"
-
-        camera = DM.CM_GetCurrentCamera()
-        acq = DM.CM_CreateAcquisitionParameters_FullCCD(
-            camera, 3, params.exposure_s, params.binning, params.binning
-        )
-        DM.CM_Validate_AcquisitionParameters(camera, acq)
-        dp = DM.CM_AcquireImage(camera, acq)
-        dp.SetName(f"DP_CL{cl}mm_exp{params.exposure_s}s")
-        if previous_mode is not None:
-            DM._state.operation_mode = previous_mode
+        if _SIMULATE:
+            if params.camera_length_mm is not None:
+                DM.EMSetCameraLength(params.camera_length_mm)
+            cl = DM.EMGetCameraLength() if DM.EMCanGetCameraLength() else 100.0
+            previous_mode = None
+            if hasattr(DM, "_state"):
+                previous_mode = DM._state.operation_mode
+                DM._state.operation_mode = "DIFFRACTION"
+            camera = DM.CM_GetCurrentCamera()
+            acq = DM.CM_CreateAcquisitionParameters_FullCCD(
+                camera, 3, params.exposure_s, params.binning, params.binning
+            )
+            DM.CM_Validate_AcquisitionParameters(camera, acq)
+            dp = DM.CM_AcquireImage(camera, acq)
+            dp.SetName(f"DP_CL{cl}mm_exp{params.exposure_s}s")
+            if previous_mode is not None:
+                DM._state.operation_mode = previous_mode
+        else:
+            if params.camera_length_mm is not None:
+                return _build_error(
+                    "UNSUPPORTED: setting camera length is not exposed in PythonReference.",
+                    "Set camera length in microscope controls (or bridge mode) before acquiring diffraction.",
+                )
+            mic = DM.Py_Microscope()
+            mode = mic.GetImagingOpticsMode()
+            if str(mode).lower() != "diffraction":
+                return _build_error(
+                    "Microscope is not in diffraction mode.",
+                    "Switch to diffraction mode before acquiring a diffraction pattern.",
+                )
+            cl = mic.GetCameraLength() if mic.CanGetCameraLength() else None
+            camera = DM.GetActiveCamera()
+            if hasattr(camera, "PrepareForAcquire"):
+                camera.PrepareForAcquire()
+            dp = camera.AcquireImage(params.exposure_s, params.binning, params.binning, 3)
+            dp.SetName(f"DP_exp{params.exposure_s}s_bin{params.binning}")
 
         arr = dp.GetNumArray()
         h, w = arr.shape[:2]
         cx, cy = w // 2, h // 2
 
-        # Radial profile to find ring positions
-        y_idx, x_idx = np.indices((h, w))
-        r = np.sqrt((x_idx - cx) ** 2 + (y_idx - cy) ** 2).astype(int)
-        r_max = min(cx, cy)
-        radial = np.array([arr[r == ri].mean() if np.any(r == ri) else 0
-                           for ri in range(r_max)])
-
-        # Find peaks in radial profile (crude, works for simulation)
-        from scipy.signal import find_peaks
-        peaks, _ = find_peaks(radial, height=radial.mean() * 1.5,
-                               distance=10)
-
-        # Pixel scale: ~0.05 1/Å per pixel at CL=100 mm (rough estimate)
-        scale_inv_A = 5.0 / cl   # 1/Å per pixel
+        ring_radii: list[int] = []
+        d_spacings: list[float] = []
+        scale_inv_A = 5.0 / float(cl) if cl else None
+        try:
+            from scipy.signal import find_peaks
+            y_idx, x_idx = np.indices((h, w))
+            r = np.sqrt((x_idx - cx) ** 2 + (y_idx - cy) ** 2).astype(int)
+            r_max = min(cx, cy)
+            radial = np.array([arr[r == ri].mean() if np.any(r == ri) else 0 for ri in range(r_max)])
+            peaks, _ = find_peaks(radial, height=radial.mean() * 1.5, distance=10)
+            ring_radii = peaks.tolist()[:8]
+            if scale_inv_A:
+                d_spacings = [round(1.0 / (rr * scale_inv_A), 3) for rr in ring_radii if rr > 0]
+            mean_bg = float(radial[:10].mean())
+        except Exception:
+            mean_bg = float(arr.mean())
 
         result = {
             "success": True,
             "acquisition_type": "Diffraction",
             "pattern": {
-                "shape":           [h, w],
+                "shape": [h, w],
                 "camera_length_mm": cl,
-                "pixel_scale_inv_A": round(scale_inv_A, 4),
+                "pixel_scale_inv_A": round(scale_inv_A, 4) if scale_inv_A else None,
                 "direct_beam_centre": [cx, cy],
-                "ring_radii_px":   peaks.tolist()[:8],
-                "d_spacings_A": [
-                    round(1.0 / (r * scale_inv_A), 3)
-                    for r in peaks.tolist()[:8]
-                    if r > 0
-                ],
+                "ring_radii_px": ring_radii,
+                "d_spacings_A": d_spacings,
                 "max_intensity": float(arr.max()),
-                "mean_bg":       float(radial[:10].mean()),
+                "mean_bg": mean_bg,
             },
         }
         return json.dumps(result, indent=2)
@@ -2398,15 +2526,27 @@ def gms_get_stage_position() -> str:
             result = _run_bridge_tool("GetStagePosition")
             return json.dumps(result, indent=2)
 
+        if _SIMULATE:
+            stage_payload = {
+                "x_um": DM.EMGetStageX(),
+                "y_um": DM.EMGetStageY(),
+                "z_um": DM.EMGetStageZ(),
+                "alpha_deg": DM.EMGetStageAlpha(),
+                "beta_deg": DM.EMGetStageBeta(),
+            }
+        else:
+            mic = DM.Py_Microscope()
+            stage_payload = {
+                "x_um": mic.GetStageX(),
+                "y_um": mic.GetStageY(),
+                "z_um": mic.GetStageZ(),
+                "alpha_deg": mic.GetStageAlpha(),
+                "beta_deg": mic.GetStageBeta(),
+            }
+
         result = {
             "success": True,
-            "stage": {
-                "x_um":      DM.EMGetStageX(),
-                "y_um":      DM.EMGetStageY(),
-                "z_um":      DM.EMGetStageZ(),
-                "alpha_deg": DM.EMGetStageAlpha(),
-                "beta_deg":  DM.EMGetStageBeta(),
-            }
+            "stage": stage_payload,
         }
         return json.dumps(result, indent=2)
     except Exception as e:
@@ -2466,29 +2606,62 @@ def gms_set_stage_position(
 
         flags = 0
         args = [0.0, 0.0, 0.0, 0.0, 0.0]
-        if params.x_um is not None:     flags |= 1;  args[0] = params.x_um
-        if params.y_um is not None:     flags |= 2;  args[1] = params.y_um
-        if params.z_um is not None:     flags |= 4;  args[2] = params.z_um
-        if params.alpha_deg is not None:flags |= 8;  args[3] = params.alpha_deg
-        if params.beta_deg is not None: flags |= 16; args[4] = params.beta_deg
+        if params.x_um is not None:
+            flags |= 1
+            args[0] = float(params.x_um)
+        if params.y_um is not None:
+            flags |= 2
+            args[1] = float(params.y_um)
+        if params.z_um is not None:
+            flags |= 4
+            args[2] = float(params.z_um)
+        if params.alpha_deg is not None:
+            flags |= 8
+            args[3] = float(params.alpha_deg)
+        if params.beta_deg is not None:
+            flags |= 16
+            args[4] = float(params.beta_deg)
 
         if flags == 0:
-            return _build_error("No axes specified. Provide at least one of "
-                                 "x_um, y_um, z_um, alpha_deg, or beta_deg.")
+            return _build_error("No axes specified. Provide at least one of x_um, y_um, z_um, alpha_deg, or beta_deg.")
 
-        DM.EMSetStagePositions(flags, *args)
-        DM.EMWaitUntilReady()
+        if _SIMULATE:
+            DM.EMSetStagePositions(flags, *args)
+            DM.EMWaitUntilReady()
+            stage_payload = {
+                "x_um": DM.EMGetStageX(),
+                "y_um": DM.EMGetStageY(),
+                "z_um": DM.EMGetStageZ(),
+                "alpha_deg": DM.EMGetStageAlpha(),
+                "beta_deg": DM.EMGetStageBeta(),
+            }
+        else:
+            mic = DM.Py_Microscope()
+            mic.SetStagePositions(flags, *args)
+            if hasattr(mic, "IsReady"):
+                t0 = time.time()
+                while time.time() - t0 < 30:
+                    try:
+                        if mic.IsReady():
+                            break
+                    except Exception:
+                        break
+                    if hasattr(DM, "Sleep"):
+                        DM.Sleep(0.1)
+                    else:
+                        time.sleep(0.1)
+            stage_payload = {
+                "x_um": mic.GetStageX(),
+                "y_um": mic.GetStageY(),
+                "z_um": mic.GetStageZ(),
+                "alpha_deg": mic.GetStageAlpha(),
+                "beta_deg": mic.GetStageBeta(),
+            }
 
         result = {
             "success": True,
             "moved_flags": flags,
-            "new_position": {
-                "x_um":      DM.EMGetStageX(),
-                "y_um":      DM.EMGetStageY(),
-                "z_um":      DM.EMGetStageZ(),
-                "alpha_deg": DM.EMGetStageAlpha(),
-                "beta_deg":  DM.EMGetStageBeta(),
-            }
+            "new_position": stage_payload,
         }
         return json.dumps(result, indent=2)
     except Exception as e:
@@ -2557,36 +2730,66 @@ def gms_set_beam_parameters(
             return json.dumps(result, indent=2)
 
         applied: dict[str, object] = {}
-        if params.spot_size is not None:
-            DM.EMSetSpotSize(params.spot_size)
-            applied["spot_size"] = params.spot_size
-        if params.focus_um is not None:
-            DM.EMSetFocus(params.focus_um)
-            applied["focus_um"] = params.focus_um
-        if params.shift_x is not None or params.shift_y is not None:
-            sx = params.shift_x if params.shift_x is not None else 0.0
-            sy = params.shift_y if params.shift_y is not None else 0.0
-            DM.EMSetCalibratedBeamShift(sx, sy)
-            applied["beam_shift"] = [sx, sy]
-        if params.tilt_x is not None or params.tilt_y is not None:
-            tx = params.tilt_x if params.tilt_x is not None else 0.0
-            ty = params.tilt_y if params.tilt_y is not None else 0.0
-            DM.EMSetBeamTilt(tx, ty)
-            applied["beam_tilt"] = [tx, ty]
-        if params.obj_stig_x is not None or params.obj_stig_y is not None:
-            sx = params.obj_stig_x if params.obj_stig_x is not None else 0.0
-            sy = params.obj_stig_y if params.obj_stig_y is not None else 0.0
-            DM.EMSetObjectiveStigmation(sx, sy)
-            applied["obj_stigmation"] = [sx, sy]
+        if _SIMULATE:
+            if params.spot_size is not None:
+                DM.EMSetSpotSize(params.spot_size)
+                applied["spot_size"] = params.spot_size
+            if params.focus_um is not None:
+                DM.EMSetFocus(params.focus_um)
+                applied["focus_um"] = params.focus_um
+            if params.shift_x is not None or params.shift_y is not None:
+                sx = params.shift_x if params.shift_x is not None else 0.0
+                sy = params.shift_y if params.shift_y is not None else 0.0
+                DM.EMSetCalibratedBeamShift(sx, sy)
+                applied["beam_shift"] = [sx, sy]
+            if params.tilt_x is not None or params.tilt_y is not None:
+                tx = params.tilt_x if params.tilt_x is not None else 0.0
+                ty = params.tilt_y if params.tilt_y is not None else 0.0
+                DM.EMSetBeamTilt(tx, ty)
+                applied["beam_tilt"] = [tx, ty]
+            if params.obj_stig_x is not None or params.obj_stig_y is not None:
+                sx = params.obj_stig_x if params.obj_stig_x is not None else 0.0
+                sy = params.obj_stig_y if params.obj_stig_y is not None else 0.0
+                DM.EMSetObjectiveStigmation(sx, sy)
+                applied["obj_stigmation"] = [sx, sy]
+            current_state = {
+                "spot_size": DM.EMGetSpotSize(),
+                "focus_um": DM.EMGetFocus(),
+                "brightness": DM.EMGetBrightness(),
+            }
+        else:
+            mic = DM.Py_Microscope()
+            if params.spot_size is not None:
+                mic.SetSpotSize(params.spot_size)
+                applied["spot_size"] = params.spot_size
+            if params.focus_um is not None:
+                mic.SetFocus(params.focus_um)
+                applied["focus_um"] = params.focus_um
+            if params.shift_x is not None or params.shift_y is not None:
+                sx = params.shift_x if params.shift_x is not None else 0.0
+                sy = params.shift_y if params.shift_y is not None else 0.0
+                mic.SetCalibratedBeamShift(sx, sy)
+                applied["beam_shift"] = [sx, sy]
+            if params.tilt_x is not None or params.tilt_y is not None:
+                tx = params.tilt_x if params.tilt_x is not None else 0.0
+                ty = params.tilt_y if params.tilt_y is not None else 0.0
+                mic.SetBeamTilt(tx, ty)
+                applied["beam_tilt"] = [tx, ty]
+            if params.obj_stig_x is not None or params.obj_stig_y is not None:
+                sx = params.obj_stig_x if params.obj_stig_x is not None else 0.0
+                sy = params.obj_stig_y if params.obj_stig_y is not None else 0.0
+                mic.SetObjectiveStigmation(sx, sy)
+                applied["obj_stigmation"] = [sx, sy]
+            current_state = {
+                "spot_size": mic.GetSpotSize(),
+                "focus_um": mic.GetFocus(),
+                "brightness": mic.GetBrightness(),
+            }
 
         result = {
             "success": True,
             "applied_settings": applied,
-            "current_state": {
-                "spot_size":  DM.EMGetSpotSize(),
-                "focus_um":   DM.EMGetFocus(),
-                "brightness": DM.EMGetBrightness(),
-            }
+            "current_state": current_state,
         }
         return json.dumps(result, indent=2)
     except Exception as e:
@@ -2643,37 +2846,57 @@ def gms_configure_detectors(
             result = _run_bridge_tool("ConfigureDetectors", params.model_dump(exclude_none=True))
             return json.dumps(result, indent=2)
 
-        camera = DM.CM_GetCurrentCamera()
         applied: dict[str, object] = {}
-
-        if params.insert_camera is not None:
-            DM.CM_SetCameraInserted(camera, int(params.insert_camera))
-            applied["camera_inserted"] = params.insert_camera
-
-        if params.target_temp_c is not None:
-            DM.CM_SetTargetTemperature_C(camera, 1, params.target_temp_c)
-            applied["target_temp_c"] = params.target_temp_c
-
-        signal_map = {
-            "haadf": (0, params.haadf_enabled),
-            "bf":    (1, params.bf_enabled),
-            "abf":   (2, params.abf_enabled),
-        }
-        for det_name, (ch, enabled) in signal_map.items():
-            if enabled is not None:
-                DM.DSSetSignalEnabled(ch, int(enabled))
-                applied[f"{det_name}_enabled"] = enabled
+        if _SIMULATE:
+            camera = DM.CM_GetCurrentCamera()
+            if params.insert_camera is not None:
+                DM.CM_SetCameraInserted(camera, int(params.insert_camera))
+                applied["camera_inserted"] = params.insert_camera
+            if params.target_temp_c is not None:
+                DM.CM_SetTargetTemperature_C(camera, 1, params.target_temp_c)
+                applied["target_temp_c"] = params.target_temp_c
+            signal_map = {
+                "haadf": (0, params.haadf_enabled),
+                "bf": (1, params.bf_enabled),
+                "abf": (2, params.abf_enabled),
+            }
+            for det_name, (ch, enabled) in signal_map.items():
+                if enabled is not None:
+                    DM.DSSetSignalEnabled(ch, int(enabled))
+                    applied[f"{det_name}_enabled"] = enabled
+            status = {
+                "camera_inserted": DM.CM_GetCameraInserted(camera),
+                "actual_temp_c": DM.CM_GetActualTemperature_C(camera),
+                "haadf_enabled": DM.DSGetSignalEnabled(0),
+                "bf_enabled": DM.DSGetSignalEnabled(1),
+                "abf_enabled": DM.DSGetSignalEnabled(2),
+            }
+        else:
+            camera = DM.GetActiveCamera()
+            if params.insert_camera is not None:
+                if hasattr(camera, "SetInserted"):
+                    camera.SetInserted(bool(params.insert_camera))
+                    applied["camera_inserted"] = params.insert_camera
+                else:
+                    applied["camera_inserted"] = "UNSUPPORTED"
+            if params.target_temp_c is not None:
+                applied["target_temp_c"] = "UNSUPPORTED"
+            for det_name, enabled in {
+                "haadf": params.haadf_enabled,
+                "bf": params.bf_enabled,
+                "abf": params.abf_enabled,
+            }.items():
+                if enabled is not None:
+                    applied[f"{det_name}_enabled"] = "UNSUPPORTED"
+            status = {
+                "camera_name": camera.GetName() if hasattr(camera, "GetName") else None,
+                "camera_inserted": camera.GetInserted() if hasattr(camera, "GetInserted") else None,
+            }
 
         result = {
             "success": True,
             "applied": applied,
-            "status": {
-                "camera_inserted":  DM.CM_GetCameraInserted(camera),
-                "actual_temp_c":    DM.CM_GetActualTemperature_C(camera),
-                "haadf_enabled":    DM.DSGetSignalEnabled(0),
-                "bf_enabled":       DM.DSGetSignalEnabled(1),
-                "abf_enabled":      DM.DSGetSignalEnabled(2),
-            }
+            "status": status,
         }
         return json.dumps(result, indent=2)
     except Exception as e:
@@ -2731,11 +2954,17 @@ def gms_acquire_tilt_series(
             return json.dumps(result, indent=2)
 
         import time as _time
-        camera = DM.CM_GetCurrentCamera()
-        acq = DM.CM_CreateAcquisitionParameters_FullCCD(
-            camera, 3, params.exposure_s, params.binning, params.binning
-        )
-        DM.CM_Validate_AcquisitionParameters(camera, acq)
+        if _SIMULATE:
+            camera = DM.CM_GetCurrentCamera()
+            acq = DM.CM_CreateAcquisitionParameters_FullCCD(
+                camera, 3, params.exposure_s, params.binning, params.binning
+            )
+            DM.CM_Validate_AcquisitionParameters(camera, acq)
+        else:
+            mic = DM.Py_Microscope()
+            camera = DM.GetActiveCamera()
+            if hasattr(camera, "PrepareForAcquire"):
+                camera.PrepareForAcquire()
 
         angles = []
         angle = params.start_deg
@@ -2747,24 +2976,42 @@ def gms_acquire_tilt_series(
         t_start = _time.time()
 
         for ang in angles:
-            DM.EMSetStageAlpha(ang)
-            DM.EMWaitUntilReady()
-            img = DM.CM_AcquireImage(camera, acq)
+            if _SIMULATE:
+                DM.EMSetStageAlpha(ang)
+                DM.EMWaitUntilReady()
+                img = DM.CM_AcquireImage(camera, acq)
+            else:
+                mic.SetStageAlpha(float(ang))
+                if hasattr(mic, "IsReady"):
+                    t0 = _time.time()
+                    while _time.time() - t0 < 30:
+                        try:
+                            if mic.IsReady():
+                                break
+                        except Exception:
+                            break
+                        if hasattr(DM, "Sleep"):
+                            DM.Sleep(0.1)
+                        else:
+                            _time.sleep(0.1)
+                img = camera.AcquireImage(params.exposure_s, params.binning, params.binning, 3)
             img.SetName(f"Tilt_{ang:+.1f}deg")
             tags = img.GetTagGroup()
-            tags.SetTagAsFloat("TiltSeries:Alpha", ang)
+            tags.SetTagAsFloat("TiltSeries:Alpha", float(ang))
 
             arr = img.GetNumArray()
             per_tilt_stats.append({
                 "angle_deg": ang,
-                "mean":      round(float(arr.mean()), 2),
-                "max":       round(float(arr.max()), 2),
+                "mean": round(float(arr.mean()), 2),
+                "max": round(float(arr.max()), 2),
             })
 
             if params.save_dir:
-                fname = os.path.join(params.save_dir,
-                                     f"tilt_{ang:+.1f}.dm4")
-                DM.SaveImage(img, fname)
+                fname = os.path.join(params.save_dir, f"tilt_{ang:+.1f}.dm4")
+                if hasattr(img, "Save"):
+                    img.Save(fname)
+                else:
+                    DM.SaveImage(img, fname)
 
         elapsed = round(_time.time() - t_start, 1)
 
