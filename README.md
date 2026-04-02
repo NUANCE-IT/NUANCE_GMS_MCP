@@ -74,7 +74,7 @@ pip install "git+https://github.com/NUANCE-IT/NUANCE_GMS_MCP.git"
 
 # Full development install from a local clone
 git clone https://github.com/NUANCE-IT/NUANCE_GMS_MCP
-cd Gatan_MCP
+cd NUANCE_GMS_MCP
 pip install -e ".[all]"
 ```
 
@@ -260,7 +260,7 @@ OLLAMA_MODEL=qwen2.5:7b /Users/robertoreis/Documents/codes/Gatan_MCP/.venv/bin/p
 ## Project Structure
 
 ```
-Gatan_MCP/
+NUANCE_GMS_MCP/
 ├── .github/workflows/ci.yml     # lint + typecheck + test matrix + build
 ├── .gitignore
 ├── CHANGELOG.md
@@ -277,7 +277,7 @@ Gatan_MCP/
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py               # session fixtures, GMS_SIMULATE=1
-│   └── test_gms_mcp.py           # 67 tests (61 hardware-free)
+│   └── test_gms_mcp.py           # 107 tests (92 hardware-independent)
 ├── examples/
 │   ├── 01_basic_query.py
 │   ├── 02_tem_acquisition.py

@@ -3166,16 +3166,23 @@ def _parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = _parse_args()
 
     mode_str = _runtime_mode().upper()
     if args.transport == "stdio":
-        # stdio: no banner on stdout — LangChain reads stdout as JSON-RPC
+        # stdio: no banner on stdout — MCP clients read stdout as JSON-RPC.
         import sys as _sys
+
         print(f"[GMS-MCP] {mode_str} mode | transport=stdio", file=_sys.stderr)
         mcp.run(transport="stdio")
     else:
-        print(f"[GMS-MCP] {mode_str} mode | transport={args.transport} "
-              f"| http://{args.host}:{args.port}/mcp")
+        print(
+            f"[GMS-MCP] {mode_str} mode | transport={args.transport} "
+            f"| http://{args.host}:{args.port}/mcp"
+        )
         mcp.run(transport=args.transport, host=args.host, port=args.port)
+
+
+if __name__ == "__main__":
+    main()

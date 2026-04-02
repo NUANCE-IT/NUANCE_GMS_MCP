@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nuance-gms-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Model Context Protocol server for Gatan Microscopy Suite 3.60 — multimodal TEM/STEM/EELS/4D-STEM control via local LLMs"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Roberto dos Reis",    email = "roberto.reis@northwestern.edu" },
     { name = "Vinayak P. Dravid",   email = "v-dravid@northwestern.edu"        },
@@ -20,7 +20,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -68,10 +67,10 @@ all = [
 ]
 
 [project.urls]
-Homepage      = "https://github.com/NUANCE-IT/Gatan_MCP"
-Documentation = "https://github.com/NUANCE-IT/Gatan_MCP/blob/main/docs/index.md"
-Repository    = "https://github.com/NUANCE-IT/Gatan_MCP"
-"Bug Tracker" = "https://github.com/NUANCE-IT/Gatan_MCP/issues"
+Homepage      = "https://github.com/NUANCE-IT/NUANCE_GMS_MCP"
+Documentation = "https://github.com/NUANCE-IT/NUANCE_GMS_MCP/blob/main/docs/index.md"
+Repository    = "https://github.com/NUANCE-IT/NUANCE_GMS_MCP"
+"Bug Tracker" = "https://github.com/NUANCE-IT/NUANCE_GMS_MCP/issues"
 Paper         = "https://arxiv.org/abs/2025.XXXXX"
 
 [project.scripts]

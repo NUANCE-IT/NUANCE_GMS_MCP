@@ -33,7 +33,7 @@ If you want the current code from this repository instead of the published PyPI
 release, use one of these commands:
 
 ```bash
-pip install "git+https://github.com/NUANCE-IT/Gatan_MCP.git"
+pip install "git+https://github.com/NUANCE-IT/NUANCE_GMS_MCP.git"
 
 # or, from a local clone
 pip install -e ".[all]"
@@ -130,8 +130,8 @@ Notes:
 ## Installing from source
 
 ```bash
-git clone https://github.com/NUANCE-IT/Gatan_MCP
-cd Gatan_MCP
+git clone https://github.com/NUANCE-IT/NUANCE_GMS_MCP
+cd NUANCE_GMS_MCP
 pip install -e ".[all]"
 
 # Verify

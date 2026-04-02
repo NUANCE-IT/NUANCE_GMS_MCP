@@ -31,7 +31,7 @@ dependencies.
 ## Repository structure
 
 ```text
-Gatan_MCP/
+NUANCE_GMS_MCP/
 ├── .github/workflows/ci.yml     # lint + typecheck + test matrix + build
 ├── .gitignore
 ├── CHANGELOG.md
@@ -48,7 +48,7 @@ Gatan_MCP/
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py               # session fixtures, GMS_SIMULATE=1
-│   └── test_gms_mcp.py           # 67 tests (61 hardware-free)
+│   └── test_gms_mcp.py           # 107 tests (92 hardware-independent)
 ├── examples/
 │   ├── 01_basic_query.py
 │   ├── 02_tem_acquisition.py

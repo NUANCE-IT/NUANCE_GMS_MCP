@@ -17,6 +17,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.1.2] — 2026-04-01
+
+### Fixed
+- Updated package/project metadata URLs to the renamed repository
+  (`NUANCE_GMS_MCP`) for Homepage, Documentation, Repository, and Bug Tracker
+- Corrected trusted-publishing workflow repository gate for PyPI release
+  job execution on the renamed repository
+- Added build hardening in CI by cleaning `dist/` and `build/` before
+  packaging and running `twine check` during the build job
+- Added missing public `main()` entry point in `gms_mcp.server` to match the
+  declared console script (`gms-mcp = gms_mcp.server:main`)
+- Updated documentation references from `Gatan_MCP` to `NUANCE_GMS_MCP`
+  and refreshed test-count statements to current suite totals
+
+---
+
 ## [0.1.1] — 2026-03-26
 
 ### Fixed
@@ -50,6 +66,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/NUANCE-IT/Gatan_MCP/compare/v0.1.1...HEAD
-[0.1.1]: https://github.com/NUANCE-IT/Gatan_MCP/releases/tag/v0.1.1
-[0.1.0]: https://github.com/NUANCE-IT/Gatan_MCP/releases/tag/v0.1.0
+[Unreleased]: https://github.com/NUANCE-IT/NUANCE_GMS_MCP/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/NUANCE-IT/NUANCE_GMS_MCP/releases/tag/v0.1.2
+[0.1.1]: https://github.com/NUANCE-IT/NUANCE_GMS_MCP/releases/tag/v0.1.1
+[0.1.0]: https://github.com/NUANCE-IT/NUANCE_GMS_MCP/releases/tag/v0.1.0
