@@ -1,6 +1,5 @@
 # NUANCE-GMS-MCP 🔬
 
-[![arXiv](https://img.shields.io/badge/arXiv-2025.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2025.XXXXX)
 [![Tests](https://github.com/NUANCE-IT/NUANCE_GMS_MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/NUANCE-IT/NUANCE_GMS_MCP/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
