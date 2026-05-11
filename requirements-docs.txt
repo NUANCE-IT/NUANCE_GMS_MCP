@@ -1,0 +1,12 @@
+# Documentation build dependencies for nuance-mcp.
+# Kept separate from the package extras so CI can install the docs
+# toolchain without dragging in vendor SDKs or the full Python deps.
+
+mkdocs>=1.6
+mkdocs-material>=9.5
+mkdocs-autorefs>=1.0
+mkdocstrings[python]>=0.26
+pymdown-extensions>=10.0
+
+# Versioned-docs support (uncomment once tag-based releases land):
+# mike>=2.1

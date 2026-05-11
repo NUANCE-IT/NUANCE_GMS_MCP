@@ -1,0 +1,183 @@
+# =============================================================================
+#  mkdocs.yml — site config for the nuance-mcp documentation
+#
+#  Build locally:
+#      pip install -r requirements-docs.txt
+#      mkdocs serve            # live preview at http://127.0.0.1:8001
+#      mkdocs build --strict   # CI-equivalent build into site/
+#
+#  Published automatically by .github/workflows/docs.yml on every push to main.
+# =============================================================================
+
+site_name:        nuance-mcp
+site_description: >-
+  Vendor-agnostic, schema-bound Model Context Protocol server for local
+  LLM-orchestrated multimodal electron microscopy.
+site_url:         https://nuance-it.github.io/nuance-mcp/
+site_author:      Roberto dos Reis & Vinayak P. Dravid
+copyright:        Copyright &copy; 2025–2026 Roberto dos Reis & Vinayak P. Dravid
+
+repo_name:        NUANCE-IT/nuance-mcp
+repo_url:         https://github.com/NUANCE-IT/nuance-mcp
+edit_uri:         edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+strict: true                    # treat warnings as errors (CI uses this)
+use_directory_urls: true
+
+# -----------------------------------------------------------------------------
+# Theme — Material for MkDocs, NUANCE purple palette
+# -----------------------------------------------------------------------------
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple        # close to NU purple in Material's palette
+      accent:  amber              # the NU "wildcat gold" accent
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent:  amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+# Custom CSS to nudge the deep-purple primary closer to NU 4E2A84.
+extra_css:
+  - assets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/NUANCE-IT/nuance-mcp
+    - icon: fontawesome/solid/microscope
+      link: https://www.nuance.northwestern.edu
+  version:
+    provider: mike
+    default: stable
+  generator: false                # remove "Made with Material for MkDocs"
+
+# -----------------------------------------------------------------------------
+# Markdown extensions
+# -----------------------------------------------------------------------------
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index:    !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: NUANCE-IT
+      repo: nuance-mcp
+  - pymdownx.mark
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# -----------------------------------------------------------------------------
+# Plugins
+# -----------------------------------------------------------------------------
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            docstring_style: sphinx
+            merge_init_into_class: true
+          paths: [src]
+  # Uncomment once a release-tag workflow is in place:
+  # - mike:
+  #     version_selector: true
+  #     css_dir: assets/css
+  #     javascript_dir: assets/js
+
+# -----------------------------------------------------------------------------
+# Navigation
+# -----------------------------------------------------------------------------
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: installation.md
+      - Quickstart:   quickstart.md
+  - Architecture:    architecture.md
+  - Adapters:
+      - Gatan:       adapters/gatan.md
+      - JEOL:        adapters/jeol.md
+      - Hitachi:     adapters/hitachi.md
+  - Reference:
+      - All 30 tools:    tools_reference.md
+      - Skills:          skills.md
+      - Safety & deployment: safety.md
+      - Bridge spec 1.0: spec/nuance-mcp-bridge-1.0.md
+  - Contributing:
+      - Add a vendor:   contributing_a_vendor.md
+  - Migration v0.1 → v0.2: migration_v0.1_to_v0.2.md
+  - Changelog:        ../CHANGELOG.md

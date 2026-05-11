@@ -1,0 +1,93 @@
+# =============================================================================
+#  docker-compose for a local-only nuance-mcp demo stack
+#
+#  Two services:
+#    nuance-mcp  — the FastMCP server, simulator adapter by default
+#    ollama      — a local Ollama daemon, qwen2.5:7b pre-pulled on first run
+#
+#  Spin up:
+#      docker compose up --build
+#
+#  Then run an Ollama-driven example from inside the same compose network:
+#      docker compose exec nuance-mcp python examples/01_basic_query.py
+#
+#  To point at a real Gatan microscope instead of the simulator, override the
+#  adapter and bridge endpoint at the command line:
+#
+#      docker compose run --rm \
+#        -e NUANCE_MCP_ADAPTER=gatan \
+#        -e GMS_MCP_ZMQ=tcp://microscope-pc.lan:5555 \
+#        nuance-mcp
+# =============================================================================
+
+services:
+
+  nuance-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ADAPTER: simulator
+    image: nuance-mcp:simulator
+    container_name: nuance-mcp
+    restart: unless-stopped
+    environment:
+      NUANCE_MCP_ADAPTER:   ${NUANCE_MCP_ADAPTER:-simulator}
+      NUANCE_MCP_TRANSPORT: http
+      NUANCE_MCP_HOST:      "0.0.0.0"
+      NUANCE_MCP_PORT:      "8000"
+      OLLAMA_BASE_URL:      http://ollama:11434
+      OLLAMA_MODEL:         ${OLLAMA_MODEL:-qwen2.5:7b}
+      # GMS bridge: set when ADAPTER=gatan to reach the microscope PC.
+      # GMS_MCP_ZMQ:        tcp://microscope-pc.lan:5555
+    ports:
+      - "8000:8000"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks: [nuance]
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nuance-ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_KEEP_ALIVE: "1h"
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    # On first start, pull the default model so the agent example works
+    # without a manual `docker exec`. Remove this command if you'd rather
+    # control model selection from the host.
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        ollama serve &
+        SERVE_PID=$$!
+        sleep 3
+        ollama pull ${OLLAMA_MODEL:-qwen2.5:7b}
+        wait $$SERVE_PID
+    networks: [nuance]
+
+  # ---- optional: docs site served from the built mkdocs output ----
+  # docs:
+  #   image: nuance-mcp:docs
+  #   build:
+  #     context: .
+  #     dockerfile: docs/Dockerfile
+  #   ports:
+  #     - "8001:8001"
+  #   networks: [nuance]
+
+networks:
+  nuance:
+
+volumes:
+  ollama-models:

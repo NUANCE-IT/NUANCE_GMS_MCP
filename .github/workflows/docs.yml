@@ -1,0 +1,77 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "src/nuance_mcp/**"           # mkdocstrings rebuilds API ref
+      - ".github/workflows/docs.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+  workflow_dispatch: {}
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+# Required for GitHub Pages deployments
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+
+  # ---------------------------------------------------------------------------
+  # 1. Build the static site (runs on every push & PR)
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # mkdocs-material needs full history for dates
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install docs toolchain
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-docs.txt
+          # Install the package itself so mkdocstrings can introspect symbols
+          pip install -e .
+
+      - name: Build with mkdocs --strict
+        run: mkdocs build --strict --verbose
+
+      - name: Upload built site as Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  # ---------------------------------------------------------------------------
+  # 2. Deploy to GitHub Pages (only on push to main / manual trigger)
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,46 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Python build / cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.eggs
+build
+dist
+.venv
+venv
+env
+
+# Editors / OS
+.vscode
+.idea
+.DS_Store
+*.swp
+
+# Test / coverage
+.pytest_cache
+.tox
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+coverage.xml
+
+# Local data
+*.dm3
+*.dm4
+*.tif
+*.tiff
+*.h5
+*.hdf5
+benchmark_results.json
+manuscript/
+
+# Docs build artefacts (we still copy docs/ source into the image so help text
+# can reference them, but the rendered site lives under site/ in dev only)
+site

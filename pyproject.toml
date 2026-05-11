@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nuance-mcp"
+version = "0.2.0a1"
+description = "Vendor-agnostic Model Context Protocol server for multimodal electron microscopy — schema-bound tool layer with pluggable adapters for Gatan, JEOL, Hitachi, …"
+readme = "README.md"
+license = "MIT"
+authors = [
+  { name = "Roberto dos Reis",   email = "roberto.reis@northwestern.edu" },
+  { name = "Vinayak P. Dravid",  email = "v-dravid@northwestern.edu" },
+]
+keywords = [
+  "electron microscopy", "TEM", "STEM", "4D-STEM", "EELS",
+  "MCP", "model context protocol", "LLM", "Ollama",
+  "Gatan", "JEOL", "Hitachi", "DigitalMicrograph", "PyJEM",
+  "autonomous microscopy",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+  "fastmcp>=3.1.0",
+  "mcp[cli]>=1.0.0",
+  "pydantic>=2.0.0",
+  "numpy>=1.24.0",
+  "scipy>=1.10.0",
+  "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+ollama = [
+  "langchain-ollama>=1.0.0",
+  "langchain-mcp-adapters>=0.2.0",
+  "langgraph>=0.2.0",
+]
+voice = [
+  "faster-whisper>=1.1.0",
+  "sounddevice>=0.4.7",
+]
+gatan = [
+  "pyzmq>=25.0.0",
+]
+jeol = [
+  # PyJEM is JEOL-proprietary and installed manually on the TEM PC.
+]
+hitachi = [
+  # placeholder
+]
+all = [
+  "nuance-mcp[ollama,voice,gatan,jeol]",
+]
+
+[project.scripts]
+nuance-mcp = "nuance_mcp.cli:main"
+
+[project.entry-points."nuance_mcp.adapters"]
+simulator = "nuance_mcp.core.simulator:SimulatorAdapter"
+gatan     = "nuance_mcp.adapters.gatan:GatanGMSAdapter"
+jeol      = "nuance_mcp.adapters.jeol:JEOLAdapter"
+hitachi   = "nuance_mcp.adapters.hitachi:HitachiAdapter"
+
+[tool.setuptools.packages.find]
+where = ["src"]
