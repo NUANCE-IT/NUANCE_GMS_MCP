@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nuance-mcp"
-version = "0.2.0a1"
+version = "0.2.0"
 description = "Vendor-agnostic Model Context Protocol server for multimodal electron microscopy — schema-bound tool layer with pluggable adapters for Gatan, JEOL, Hitachi, …"
 readme = "README.md"
 license = "MIT"
