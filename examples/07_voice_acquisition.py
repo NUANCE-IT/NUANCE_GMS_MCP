@@ -28,16 +28,25 @@ from _common import make_server, banner
 
 def _parse() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--adapter", default="simulator",
-                   choices=["simulator", "gatan", "jeol", "hitachi"])
+    p.add_argument(
+        "--adapter",
+        default="simulator",
+        choices=["simulator", "gatan", "jeol", "hitachi"],
+    )
     p.add_argument("--mode", default=None)
-    p.add_argument("--transcript", default="",
-                   help="Skip recording; use this string instead.")
+    p.add_argument(
+        "--transcript", default="", help="Skip recording; use this string instead."
+    )
     p.add_argument("--ollama-model", default="qwen2.5:7b")
-    p.add_argument("--ollama-url", default=os.environ.get(
-        "OLLAMA_BASE_URL", "http://127.0.0.1:11434"))
-    p.add_argument("--speak", action="store_true",
-                   help="Speak the agent reply (macOS 'say' by default).")
+    p.add_argument(
+        "--ollama-url",
+        default=os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
+    )
+    p.add_argument(
+        "--speak",
+        action="store_true",
+        help="Speak the agent reply (macOS 'say' by default).",
+    )
     return p.parse_args()
 
 
@@ -50,13 +59,13 @@ async def main() -> None:
     else:
         try:
             from nuance_mcp.voice import (
-                LocalWhisperTranscriber, record_push_to_talk,
+                LocalWhisperTranscriber,
+                record_push_to_talk,
                 remove_temp_audio_file,
             )
         except ImportError as exc:
             sys.exit(
-                f"voice extras unavailable: {exc}. "
-                "pip install 'nuance-mcp[voice]'"
+                f"voice extras unavailable: {exc}. pip install 'nuance-mcp[voice]'"
             )
         print("Press Enter to start recording, Enter again to stop.")
         audio = record_push_to_talk()
@@ -70,18 +79,18 @@ async def main() -> None:
     try:
         from nuance_mcp.agent import run_agent
     except ImportError:
-        sys.exit("ollama extras unavailable; "
-                 "pip install 'nuance-mcp[ollama]'")
+        sys.exit("ollama extras unavailable; pip install 'nuance-mcp[ollama]'")
 
-    answer = await run_agent(server, transcript,
-                             model=args.ollama_model,
-                             base_url=args.ollama_url)
+    answer = await run_agent(
+        server, transcript, model=args.ollama_model, base_url=args.ollama_url
+    )
     banner("Agent reply")
     print(answer)
 
     if args.speak:
         try:
             from nuance_mcp.voice import speak_text
+
             speak_text(answer)
         except Exception as exc:
             print(f"[voice] speech output skipped: {exc}")

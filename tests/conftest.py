@@ -1,4 +1,5 @@
 """Shared pytest fixtures."""
+
 import os, sys
 
 # Ensure the in-repo src/ is importable for development without `pip install`.

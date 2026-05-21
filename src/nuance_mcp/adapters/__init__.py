@@ -24,9 +24,9 @@ from ..core.adapter import MicroscopeAdapter
 # imports happen lazily inside each module).
 _BUILTIN = {
     "simulator": "nuance_mcp.core.simulator:SimulatorAdapter",
-    "gatan":     "nuance_mcp.adapters.gatan:GatanGMSAdapter",
-    "jeol":      "nuance_mcp.adapters.jeol:JEOLAdapter",
-    "hitachi":   "nuance_mcp.adapters.hitachi:HitachiAdapter",
+    "gatan": "nuance_mcp.adapters.gatan:GatanGMSAdapter",
+    "jeol": "nuance_mcp.adapters.jeol:JEOLAdapter",
+    "hitachi": "nuance_mcp.adapters.hitachi:HitachiAdapter",
 }
 
 
@@ -36,6 +36,7 @@ def load_adapter(name: str) -> Type[MicroscopeAdapter]:
     try:
         # Entry points first (third-party adapters take precedence)
         from importlib.metadata import entry_points
+
         eps = entry_points(group="nuance_mcp.adapters")
         for ep in eps:
             if ep.name == name:
@@ -45,8 +46,7 @@ def load_adapter(name: str) -> Type[MicroscopeAdapter]:
 
     if name not in _BUILTIN:
         raise ValueError(
-            f"unknown adapter {name!r}; built-in choices: "
-            + ", ".join(_BUILTIN)
+            f"unknown adapter {name!r}; built-in choices: " + ", ".join(_BUILTIN)
         )
     module_path, _, class_name = _BUILTIN[name].partition(":")
     mod = importlib.import_module(module_path)

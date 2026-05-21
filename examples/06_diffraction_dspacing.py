@@ -25,19 +25,23 @@ async def main():
         return
 
     banner("Diffraction pattern")
-    img = await call(server, "acquire_diffraction",
-                     payload={"exposure_s": 0.5,
-                              "camera_length_mm": 300.0, "binning": 1})
-    kv("Name",  img.get("name"))
+    img = await call(
+        server,
+        "acquire_diffraction",
+        payload={"exposure_s": 0.5, "camera_length_mm": 300.0, "binning": 1},
+    )
+    kv("Name", img.get("name"))
     kv("Shape", img.get("shape"))
     stats = img.get("statistics", {})
     kv("Max counts", stats.get("max"))
 
     if "analysis.radial_profile" in caps["capabilities"]:
         banner("Radial profile")
-        out = await call(server, "compute_radial_profile",
-                         payload={"mode": "diffraction",
-                                  "smooth_sigma": 1.5})
+        out = await call(
+            server,
+            "compute_radial_profile",
+            payload={"mode": "diffraction", "smooth_sigma": 1.5},
+        )
         kv("response (truncated)", str(out)[:200])
 
 

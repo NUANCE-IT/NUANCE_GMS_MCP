@@ -47,11 +47,13 @@ JsonMessage = JsonDict
 
 class BridgeError(Exception):
     """Bridge-side error from GMS."""
+
     pass
 
 
 class BridgeTimeout(Exception):
     """ZeroMQ send/recv timeout."""
+
     pass
 
 
@@ -505,13 +507,15 @@ class BridgeServer:
                 alpha=params.get("alpha"),
                 beta=params.get("beta"),
             )
-            return self._ok({
-                "x": dm.stage_x_um,
-                "y": dm.stage_y_um,
-                "z": dm.stage_z_um,
-                "alpha": dm.stage_alpha_deg,
-                "beta": dm.stage_beta_deg,
-            })
+            return self._ok(
+                {
+                    "x": dm.stage_x_um,
+                    "y": dm.stage_y_um,
+                    "z": dm.stage_z_um,
+                    "alpha": dm.stage_alpha_deg,
+                    "beta": dm.stage_beta_deg,
+                }
+            )
         except Exception as e:
             return self._error("error", f"set_stage_position failed: {e}")
 
@@ -629,9 +633,11 @@ class BridgeServer:
 
             # Build the tilt series
             images = []
-            for tilt in range(-params.get("tilt_start", -30),
-                              params.get("tilt_end", 30),
-                              params.get("tilt_step", 1)):
+            for tilt in range(
+                -params.get("tilt_start", -30),
+                params.get("tilt_end", 30),
+                params.get("tilt_step", 1),
+            ):
                 # Acquire at the current tilt angle
                 dm.set_stage_tilt(tilt)
                 dm.do_events()
@@ -640,10 +646,12 @@ class BridgeServer:
                     binning=params.get("binning", 1),
                     processing=params.get("processing", 1),
                 )
-                images.append({
-                    "tilt_deg": tilt,
-                    "name": image.name,
-                })
+                images.append(
+                    {
+                        "tilt_deg": tilt,
+                        "name": image.name,
+                    }
+                )
 
             return self._ok({"images": images, "n_images": len(images)})
         except Exception as e:
@@ -662,15 +670,17 @@ class BridgeServer:
 
             # Store job metadata
             # (In a real implementation, this would persist somewhere)
-            return self._ok({
-                "job_id": job_id,
-                "job_type": job_type,
-                "state": state,
-                "iterations": iterations,
-                "started_at": started_at,
-                "last_update": last_update,
-                "error": error,
-            })
+            return self._ok(
+                {
+                    "job_id": job_id,
+                    "job_type": job_type,
+                    "state": state,
+                    "iterations": iterations,
+                    "started_at": started_at,
+                    "last_update": last_update,
+                    "error": error,
+                }
+            )
         except Exception as e:
             return self._error("error", f"start_live_processing_job failed: {e}")
 
@@ -680,12 +690,14 @@ class BridgeServer:
             job_id = params.get("job_id")
             # Look up the job metadata
             # (In a real implementation, this would read from persistence)
-            return self._ok({
-                "job_id": job_id,
-                "state": "running",
-                "last_update": int(time.time()),
-                "error": "",
-            })
+            return self._ok(
+                {
+                    "job_id": job_id,
+                    "state": "running",
+                    "last_update": int(time.time()),
+                    "error": "",
+                }
+            )
         except Exception as e:
             return self._error("error", f"get_live_processing_job_status failed: {e}")
 
@@ -703,14 +715,18 @@ class BridgeServer:
                 "completed_at": int(time.time()),
             }
 
-            return self._ok({
-                "summary": summary,
-                "derived": {
-                    "name": "processed",
-                    "data_dtype": "float32",
-                    "data_b64": "",
-                } if include_data else None,
-            })
+            return self._ok(
+                {
+                    "summary": summary,
+                    "derived": {
+                        "name": "processed",
+                        "data_dtype": "float32",
+                        "data_b64": "",
+                    }
+                    if include_data
+                    else None,
+                }
+            )
         except Exception as e:
             return self._error("error", f"get_live_processing_job_result failed: {e}")
 
@@ -719,11 +735,13 @@ class BridgeServer:
         try:
             job_id = params.get("job_id")
             # In a real implementation, stop the job and return the final result
-            return self._ok({
-                "job_id": job_id,
-                "state": "stopped",
-                "error": "",
-            })
+            return self._ok(
+                {
+                    "job_id": job_id,
+                    "state": "stopped",
+                    "error": "",
+                }
+            )
         except Exception as e:
             return self._error("error", f"stop_live_processing_job failed: {e}")
 
@@ -765,13 +783,15 @@ class BridgeServer:
             center = params.get("center", [512, 512])
 
             # Compute the radial profile
-            return self._ok({
-                "name": "radial_profile",
-                "radius": params.get("radius", 256),
-                "data_dtype": "float32",
-                "data_b64": "",
-                "center": center,
-            })
+            return self._ok(
+                {
+                    "name": "radial_profile",
+                    "radius": params.get("radius", 256),
+                    "data_dtype": "float32",
+                    "data_b64": "",
+                    "center": center,
+                }
+            )
         except Exception as e:
             return self._error("error", f"compute_radial_profile failed: {e}")
 
@@ -888,9 +908,13 @@ class BridgeServer:
             }
 
             # Add tags
-            tags: dict = {
-                "name": image.name,
-            } if include_tags else {}
+            tags: dict = (
+                {
+                    "name": image.name,
+                }
+                if include_tags
+                else {}
+            )
 
             return self._ok(
                 {
@@ -903,7 +927,9 @@ class BridgeServer:
                     "calibration": {
                         "scale": pixel_size_nm,
                         "unit": pixel_unit,
-                    } if pixel_size_nm else {},
+                    }
+                    if pixel_size_nm
+                    else {},
                     "metadata": metadata,
                     "tags": tags,
                 }

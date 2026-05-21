@@ -26,10 +26,14 @@ from nuance_mcp import build_server
 
 def parse_args(description: str) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=description)
-    p.add_argument("--adapter", default="simulator",
-                   choices=["simulator", "gatan", "jeol", "hitachi"])
-    p.add_argument("--mode", default=None,
-                   help="Adapter-specific mode (e.g. JEOL online/offline).")
+    p.add_argument(
+        "--adapter",
+        default="simulator",
+        choices=["simulator", "gatan", "jeol", "hitachi"],
+    )
+    p.add_argument(
+        "--mode", default=None, help="Adapter-specific mode (e.g. JEOL online/offline)."
+    )
     return p.parse_args()
 
 
@@ -40,8 +44,7 @@ def make_server(args: argparse.Namespace):
     try:
         return build_server(args.adapter, adapter_kwargs=kwargs)
     except Exception as exc:
-        print(f"[examples] {args.adapter!r} adapter failed: {exc}",
-              file=sys.stderr)
+        print(f"[examples] {args.adapter!r} adapter failed: {exc}", file=sys.stderr)
         print(f"[examples] falling back to simulator.", file=sys.stderr)
         return build_server("simulator")
 

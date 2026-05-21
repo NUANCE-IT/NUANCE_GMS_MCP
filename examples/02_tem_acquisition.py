@@ -23,15 +23,16 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     if "tem" not in caps["capabilities"]:
-        print(f"This adapter ({caps['vendor']}) does not advertise TEM. "
-              "Aborting.")
+        print(f"This adapter ({caps['vendor']}) does not advertise TEM. Aborting.")
         return
 
-    img = await call(server, "acquire_tem_image",
-                     payload={"exposure_s": 0.5, "binning": 2,
-                              "processing": 3})
+    img = await call(
+        server,
+        "acquire_tem_image",
+        payload={"exposure_s": 0.5, "binning": 2, "processing": 3},
+    )
     banner("Acquired TEM image")
-    kv("Name",  img.get("name"))
+    kv("Name", img.get("name"))
     kv("Shape", img.get("shape"))
     kv("dtype", img.get("dtype"))
     stats = img.get("statistics", {})
@@ -43,9 +44,11 @@ async def main():
 
     banner("Negative control — schema rejection")
     try:
-        await call(server, "acquire_tem_image",
-                   payload={"exposure_s": 1000.0, "binning": 1,
-                            "processing": 3})
+        await call(
+            server,
+            "acquire_tem_image",
+            payload={"exposure_s": 1000.0, "binning": 1, "processing": 3},
+        )
         print("  unexpected: 1000 s exposure was NOT rejected!")
     except Exception as exc:
         print(f"  rejected before any vendor call: {type(exc).__name__}")

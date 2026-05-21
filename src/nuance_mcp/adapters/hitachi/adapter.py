@@ -19,13 +19,20 @@ class HitachiAdapter(MicroscopeAdapter):
 
     vendor = "Hitachi"
     model = "HT/HF-series"
-    bridge_required = True       # Hitachi SDK is typically host-bound
+    bridge_required = True  # Hitachi SDK is typically host-bound
     is_thread_safe = False
-    capabilities = frozenset({
-        Capability.TEM, Capability.STEM, Capability.DIFFRACTION,
-        Capability.STAGE, Capability.STAGE_TILT, Capability.OPTICS,
-        Capability.DETECTORS, Capability.TILT_SERIES,
-    })
+    capabilities = frozenset(
+        {
+            Capability.TEM,
+            Capability.STEM,
+            Capability.DIFFRACTION,
+            Capability.STAGE,
+            Capability.STAGE_TILT,
+            Capability.OPTICS,
+            Capability.DETECTORS,
+            Capability.TILT_SERIES,
+        }
+    )
 
     def open(self) -> None:
         raise CapabilityUnavailable(

@@ -19,8 +19,10 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 class _StrictModel(BaseModel):
     """Forbid unknown fields; strip whitespace from strings."""
+
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
 
@@ -39,6 +41,7 @@ def _validate_roi(v: Optional[list[int]]) -> Optional[list[int]]:
 # Diagnostics
 # ---------------------------------------------------------------------------
 
+
 class FrontImageInput(_StrictModel):
     include_data: bool = Field(default=False)
     include_tags: bool = Field(default=True)
@@ -48,6 +51,7 @@ class FrontImageInput(_StrictModel):
 # Acquisition
 # ---------------------------------------------------------------------------
 
+
 class AcquireTEMInput(_StrictModel):
     exposure_s: float = Field(default=1.0, ge=0.001, le=60.0)
     binning: int = Field(default=1, ge=1, le=8)
@@ -56,7 +60,8 @@ class AcquireTEMInput(_StrictModel):
 
     @field_validator("roi")
     @classmethod
-    def _v_roi(cls, v): return _validate_roi(v)
+    def _v_roi(cls, v):
+        return _validate_roi(v)
 
 
 class AcquireSTEMInput(_StrictModel):
@@ -92,6 +97,7 @@ class AcquireDiffractionInput(_StrictModel):
 # ---------------------------------------------------------------------------
 # Stage / Optics / Detectors
 # ---------------------------------------------------------------------------
+
 
 class SetStageInput(_StrictModel):
     x_um: Optional[float] = Field(default=None, ge=-5000.0, le=5000.0)
@@ -146,6 +152,7 @@ class SetCondenserStigmationInput(_StrictModel):
 # Tilt series
 # ---------------------------------------------------------------------------
 
+
 class TiltSeriesInput(_StrictModel):
     start_deg: float = Field(default=-60.0, ge=-80.0, le=0.0)
     end_deg: float = Field(default=60.0, ge=0.0, le=80.0)
@@ -159,6 +166,7 @@ class TiltSeriesInput(_StrictModel):
 # Derived analyses
 # ---------------------------------------------------------------------------
 
+
 class ImageFilterInput(_StrictModel):
     roi: Optional[list[int]] = Field(default=None)
     median_size: int = Field(default=0, ge=0, le=21)
@@ -168,7 +176,8 @@ class ImageFilterInput(_StrictModel):
 
     @field_validator("roi")
     @classmethod
-    def _v_roi(cls, v): return _validate_roi(v)
+    def _v_roi(cls, v):
+        return _validate_roi(v)
 
 
 class RadialProfileInput(_StrictModel):
@@ -182,7 +191,8 @@ class RadialProfileInput(_StrictModel):
 
     @field_validator("roi")
     @classmethod
-    def _v_roi(cls, v): return _validate_roi(v)
+    def _v_roi(cls, v):
+        return _validate_roi(v)
 
 
 class MaxFFTInput(_StrictModel):
@@ -195,7 +205,8 @@ class MaxFFTInput(_StrictModel):
 
     @field_validator("roi")
     @classmethod
-    def _v_roi(cls, v): return _validate_roi(v)
+    def _v_roi(cls, v):
+        return _validate_roi(v)
 
 
 class MaxSpotMapInput(_StrictModel):
@@ -212,8 +223,11 @@ class MaxSpotMapInput(_StrictModel):
 # ---------------------------------------------------------------------------
 
 LIVE_JOB_TYPES = (
-    "radial_profile", "difference", "fft_map",
-    "filtered_view", "maximum_spot_mapping",
+    "radial_profile",
+    "difference",
+    "fft_map",
+    "filtered_view",
+    "maximum_spot_mapping",
 )
 
 
@@ -245,7 +259,8 @@ class StartLiveProcessingJobInput(_StrictModel):
 
     @field_validator("roi")
     @classmethod
-    def _v_roi(cls, v): return _validate_roi(v)
+    def _v_roi(cls, v):
+        return _validate_roi(v)
 
 
 class LiveProcessingJobQuery(_StrictModel):

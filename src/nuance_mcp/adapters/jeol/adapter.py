@@ -20,7 +20,10 @@ import numpy as np
 from typing import Any, Optional, Sequence, Tuple, List, Dict
 
 from ...core.adapter import (
-    MicroscopeAdapter, MicroscopeState, ImageReturn, SpectrumReturn,
+    MicroscopeAdapter,
+    MicroscopeState,
+    ImageReturn,
+    SpectrumReturn,
     CapabilityUnavailable,
 )
 from ...core.capabilities import Capability
@@ -36,21 +39,34 @@ class JEOLAdapter(MicroscopeAdapter):
 
     vendor = "JEOL"
     model = "TEM3 / PyJEM"
-    bridge_required = False   # PyJEM runs in-process
+    bridge_required = False  # PyJEM runs in-process
     is_thread_safe = False
-    capabilities = frozenset({
-        Capability.TEM, Capability.STEM, Capability.STEM_HAADF,
-        Capability.STEM_BF, Capability.STEM_ABF,
-        Capability.EELS, Capability.EDS, Capability.DIFFRACTION,
-        Capability.TILT_SERIES,
-        Capability.STAGE, Capability.STAGE_TILT,
-        Capability.OPTICS, Capability.DETECTORS,
-        Capability.HT, Capability.FEG, Capability.APERTURES,
-        Capability.BEAM_BLANKER,
-        Capability.RADIAL_PROFILE, Capability.IMAGE_FILTER,
-        Capability.LIVE_JOBS,
-        Capability.FFT, Capability.DPC,
-    })
+    capabilities = frozenset(
+        {
+            Capability.TEM,
+            Capability.STEM,
+            Capability.STEM_HAADF,
+            Capability.STEM_BF,
+            Capability.STEM_ABF,
+            Capability.EELS,
+            Capability.EDS,
+            Capability.DIFFRACTION,
+            Capability.TILT_SERIES,
+            Capability.STAGE,
+            Capability.STAGE_TILT,
+            Capability.OPTICS,
+            Capability.DETECTORS,
+            Capability.HT,
+            Capability.FEG,
+            Capability.APERTURES,
+            Capability.BEAM_BLANKER,
+            Capability.RADIAL_PROFILE,
+            Capability.IMAGE_FILTER,
+            Capability.LIVE_JOBS,
+            Capability.FFT,
+            Capability.DPC,
+        }
+    )
     # 4D-STEM not currently advertised — PyJEM exposes scan + camera
     # primitives but no integrated 4D-STEM acquisition mode. Will be added
     # once a vendor-side helper is available.
@@ -58,15 +74,15 @@ class JEOLAdapter(MicroscopeAdapter):
     def __init__(self, *, mode: str = "auto") -> None:
         super().__init__()
         self._mode = mode
-        self._tem3 = None      # PyJEM[.offline].TEM3 module
+        self._tem3 = None  # PyJEM[.offline].TEM3 module
         self._stage = None
         self._eos = None
         self._ht = None
         self._lens = None
         self._gun = None
         self._feg = None
-        self._diff = None      # Diffraction module
-        self._workspace = None # EDS/STEM workspace
+        self._diff = None  # Diffraction module
+        self._workspace = None  # EDS/STEM workspace
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -82,12 +98,12 @@ class JEOLAdapter(MicroscopeAdapter):
 
         # Memoised vendor singletons (mirrors jeol_mcp.adapters)
         self._stage = self._tem3.Stage3()
-        self._eos   = self._tem3.EOS3()
-        self._ht    = self._tem3.HT3()
-        self._lens  = self._tem3.Lens3()
-        self._gun   = self._tem3.GUN3()
-        self._feg   = self._tem3.FEG3()
-        self._diff  = self._tem3.DIFF3()
+        self._eos = self._tem3.EOS3()
+        self._ht = self._tem3.HT3()
+        self._lens = self._tem3.Lens3()
+        self._gun = self._tem3.GUN3()
+        self._feg = self._tem3.FEG3()
+        self._diff = self._tem3.DIFF3()
         self._workspace = self._tem3.Workspace()
 
     def close(self) -> None:
@@ -121,12 +137,17 @@ class JEOLAdapter(MicroscopeAdapter):
         mode_name = {0: "TEM", 1: "STEM", 2: "DIFFRACTION"}.get(mode_idx, str(mode_idx))
         sx, sy, sz, sa, sb = self._stage.GetPos()
         return MicroscopeState(
-            vendor=self.vendor, model=self.model,
-            high_tension_kV=ht_kV, mode=mode_name,
+            vendor=self.vendor,
+            model=self.model,
+            high_tension_kV=ht_kV,
+            mode=mode_name,
             magnification=float(self._eos.GetMagValue()[0]),
             spot_size=int(self._eos.GetSpotSize()),
-            stage_x_um=sx, stage_y_um=sy, stage_z_um=sz,
-            stage_alpha_deg=sa, stage_beta_deg=sb,
+            stage_x_um=sx,
+            stage_y_um=sy,
+            stage_z_um=sz,
+            stage_alpha_deg=sa,
+            stage_beta_deg=sb,
             illumination_mode="Convergent" if mode_idx == 1 else "Parallel",
         )
 
@@ -160,15 +181,19 @@ class JEOLAdapter(MicroscopeAdapter):
     # ------------------------------------------------------------------
     def get_stage_position(self):
         sx, sy, sz, sa, sb = self._stage.GetPos()
-        return {"x_um": sx, "y_um": sy, "z_um": sz,
-                "alpha_deg": sa, "beta_deg": sb}
+        return {"x_um": sx, "y_um": sy, "z_um": sz, "alpha_deg": sa, "beta_deg": sb}
 
     def set_stage_position(self, **kw):
-        if "x_um" in kw: self._stage.SetX(float(kw["x_um"]))
-        if "y_um" in kw: self._stage.SetY(float(kw["y_um"]))
-        if "z_um" in kw: self._stage.SetZ(float(kw["z_um"]))
-        if "alpha_deg" in kw: self._stage.SetTiltXAngle(float(kw["alpha_deg"]))
-        if "beta_deg" in kw:  self._stage.SetTiltYAngle(float(kw["beta_deg"]))
+        if "x_um" in kw:
+            self._stage.SetX(float(kw["x_um"]))
+        if "y_um" in kw:
+            self._stage.SetY(float(kw["y_um"]))
+        if "z_um" in kw:
+            self._stage.SetZ(float(kw["z_um"]))
+        if "alpha_deg" in kw:
+            self._stage.SetTiltXAngle(float(kw["alpha_deg"]))
+        if "beta_deg" in kw:
+            self._stage.SetTiltYAngle(float(kw["beta_deg"]))
         return self.get_stage_position()
 
     def stop_stage(self):
@@ -233,9 +258,13 @@ class JEOLAdapter(MicroscopeAdapter):
         cam.SetExposureTime(int(exposure_s * 1000))
         cam.SetBinning(binning)
         arr = cam.Acquire()
-        return ImageReturn(data=arr, name="JEOL_TEM",
-                           pixel_size_nm=None, exposure_s=exposure_s,
-                           tags={"processing": processing, "binning": binning})
+        return ImageReturn(
+            data=arr,
+            name="JEOL_TEM",
+            pixel_size_nm=None,
+            exposure_s=exposure_s,
+            tags={"processing": processing, "binning": binning},
+        )
 
     def acquire_stem(self, exposure_s, beam_current, processing, roi):
         """Acquire a STEM image."""
@@ -243,9 +272,13 @@ class JEOLAdapter(MicroscopeAdapter):
         cam.SetExposureTime(int(exposure_s * 1000))
         cam.SetBinning(1)
         arr = cam.Acquire()
-        return ImageReturn(data=arr, name="JEOL_STEM",
-                           pixel_size_nm=None, exposure_s=exposure_s,
-                           tags={"processing": processing, "beam_current": beam_current})
+        return ImageReturn(
+            data=arr,
+            name="JEOL_STEM",
+            pixel_size_nm=None,
+            exposure_s=exposure_s,
+            tags={"processing": processing, "beam_current": beam_current},
+        )
 
     def acquire_tem_haalf(self, exposure_s, binning, processing, roi):
         """Acquire a STEM HAADF image."""
@@ -253,9 +286,13 @@ class JEOLAdapter(MicroscopeAdapter):
         cam.SetExposureTime(int(exposure_s * 1000))
         cam.SetBinning(binning)
         arr = cam.Acquire()
-        return ImageReturn(data=arr, name="JEOL_STEM_HAADF",
-                           pixel_size_nm=None, exposure_s=exposure_s,
-                           tags={"processing": processing, "binning": binning})
+        return ImageReturn(
+            data=arr,
+            name="JEOL_STEM_HAADF",
+            pixel_size_nm=None,
+            exposure_s=exposure_s,
+            tags={"processing": processing, "binning": binning},
+        )
 
     def acquire_stem_abf(self, exposure_s, binning, processing, roi):
         """Acquire a STEM ABF image."""
@@ -263,9 +300,13 @@ class JEOLAdapter(MicroscopeAdapter):
         cam.SetExposureTime(int(exposure_s * 1000))
         cam.SetBinning(binning)
         arr = cam.Acquire()
-        return ImageReturn(data=arr, name="JEOL_STEM_ABF",
-                           pixel_size_nm=None, exposure_s=exposure_s,
-                           tags={"processing": processing, "binning": binning})
+        return ImageReturn(
+            data=arr,
+            name="JEOL_STEM_ABF",
+            pixel_size_nm=None,
+            exposure_s=exposure_s,
+            tags={"processing": processing, "binning": binning},
+        )
 
     def acquire_diffraction(self, exposure_s, binning, processing, roi):
         """Acquire a diffraction pattern."""
@@ -274,23 +315,36 @@ class JEOLAdapter(MicroscopeAdapter):
         cam.SetExposureTime(int(exposure_s * 1000))
         cam.SetBinning(binning)
         arr = cam.Acquire()
-        return ImageReturn(data=arr, name="JEOL_DIFFRACTION",
-                           pixel_size_nm=None, exposure_s=exposure_s,
-                           tags={"processing": processing, "binning": binning})
+        return ImageReturn(
+            data=arr,
+            name="JEOL_DIFFRACTION",
+            pixel_size_nm=None,
+            exposure_s=exposure_s,
+            tags={"processing": processing, "binning": binning},
+        )
 
     # EELS acquisition is deliberately disabled (capability still advertised
     # but wiring under development)
-    def acquire_eels(self, exposure_s, energy_offset_eV, slit_width_eV,
-                     dispersion_idx, full_vertical_binning):
-        raise CapabilityUnavailable(
-            "JEOL EELS acquisition wiring is under development"
-        )
+    def acquire_eels(
+        self,
+        exposure_s,
+        energy_offset_eV,
+        slit_width_eV,
+        dispersion_idx,
+        full_vertical_binning,
+    ):
+        raise CapabilityUnavailable("JEOL EELS acquisition wiring is under development")
 
     # ------------------------------------------------------------------
     # Image Processing
     # ------------------------------------------------------------------
-    def apply_image_filter(self, data: Sequence[int], filter_name: str,
-                           kernel_size: int, sigma: Optional[float] = None) -> Sequence[int]:
+    def apply_image_filter(
+        self,
+        data: Sequence[int],
+        filter_name: str,
+        kernel_size: int,
+        sigma: Optional[float] = None,
+    ) -> Sequence[int]:
         """Apply a filter to image data."""
         img = np.array(data, dtype=np.float32)
         if filter_name == "blur":
@@ -311,23 +365,33 @@ class JEOLAdapter(MicroscopeAdapter):
                 img = (img - mn) / (mx - mn) * 255
         return img.astype(np.uint8)
 
-    def get_radial_profile(self, data: Sequence[int], center: Tuple[int, int],
-                           num_rings: int) -> SpectrumReturn:
+    def get_radial_profile(
+        self, data: Sequence[int], center: Tuple[int, int], num_rings: int
+    ) -> SpectrumReturn:
         """Compute a radial profile of image data."""
         img = np.array(data, dtype=np.float32).reshape(-1, 1)
         rows, cols = img.shape
         y, x = np.ogrid[:rows, :cols]
-        distances = np.sqrt((x - center[0])**2 + (y - center[1])**2)
+        distances = np.sqrt((x - center[0]) ** 2 + (y - center[1]) ** 2)
         for r in range(num_rings):
             r_inner = r * rows / num_rings
             r_outer = (r + 1) * rows / num_rings
             mask = (distances >= r_inner) & (distances < r_outer)
             ring_intensity = np.mean(img[mask])
-        spectrum = np.array([ring_intensity for _ in range(num_rings)], dtype=np.float32)
-        return SpectrumReturn(data=spectrum, name="radial_profile",
-                              energy_eV=None, pixel_size_nm=None, exposure_s=0)
+        spectrum = np.array(
+            [ring_intensity for _ in range(num_rings)], dtype=np.float32
+        )
+        return SpectrumReturn(
+            data=spectrum,
+            name="radial_profile",
+            energy_eV=None,
+            pixel_size_nm=None,
+            exposure_s=0,
+        )
 
-    def compute_fft(self, data: Sequence[int], crop: Optional[Tuple[int, int, int, int]] = None) -> Sequence[int]:
+    def compute_fft(
+        self, data: Sequence[int], crop: Optional[Tuple[int, int, int, int]] = None
+    ) -> Sequence[int]:
         """Compute FFT of image data and return magnitude as grayscale."""
         if crop:
             img = np.array(data, dtype=np.float32)[crop]
@@ -344,8 +408,9 @@ class JEOLAdapter(MicroscopeAdapter):
         fft_img = (fft_mag - fft_mag.min()) / (fft_mag.max() - fft_mag.min()) * 255
         return fft_img.astype(np.uint8)
 
-    def compute_dpc(self, data: Sequence[int], diffraction: Sequence[int],
-                    binning: int = 1) -> Tuple[Sequence[int], Sequence[int]]:
+    def compute_dpc(
+        self, data: Sequence[int], diffraction: Sequence[int], binning: int = 1
+    ) -> Tuple[Sequence[int], Sequence[int]]:
         """Compute DPC (dipole pair correlation) displacement."""
         img = np.array(data, dtype=np.float32)
         diff = np.array(diffraction, dtype=np.float32)
@@ -357,9 +422,12 @@ class JEOLAdapter(MicroscopeAdapter):
         dy = np.zeros((rows, cols), dtype=np.float32)
         return dx.astype(np.uint8), dy.astype(np.uint8)
 
-    def script_template(self, data: Sequence[int],
-                        template_name: str,
-                        template_params: Optional[Dict[str, Any]] = None) -> Sequence[int]:
+    def script_template(
+        self,
+        data: Sequence[int],
+        template_name: str,
+        template_params: Optional[Dict[str, Any]] = None,
+    ) -> Sequence[int]:
         """Apply a script template to image data."""
         img = np.array(data, dtype=np.float32)
         if template_name == "flat_field_correction":
@@ -382,8 +450,9 @@ class JEOLAdapter(MicroscopeAdapter):
         """Set live jobs to run."""
         pass
 
-    def create_background_task(self, callback: Optional[Callable], args: Tuple,
-                               name: str) -> int:
+    def create_background_task(
+        self, callback: Optional[Callable], args: Tuple, name: str
+    ) -> int:
         """Create a background task."""
         return 1  # placeholder
 

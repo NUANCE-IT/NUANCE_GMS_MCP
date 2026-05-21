@@ -33,6 +33,7 @@ from typing import Any, Optional
 # Lazy imports & dependency guard
 # ---------------------------------------------------------------------------
 
+
 class AgentDependencyError(ImportError):
     """Raised when the ``[ollama]`` extra is not installed."""
 
@@ -40,15 +41,15 @@ class AgentDependencyError(ImportError):
 def _require_ollama_extra():
     missing = []
     try:
-        import langchain_ollama          # noqa: F401
+        import langchain_ollama  # noqa: F401
     except ImportError:
         missing.append("langchain-ollama")
     try:
-        import langchain_mcp_adapters    # noqa: F401
+        import langchain_mcp_adapters  # noqa: F401
     except ImportError:
         missing.append("langchain-mcp-adapters")
     try:
-        import langgraph                 # noqa: F401
+        import langgraph  # noqa: F401
     except ImportError:
         missing.append("langgraph")
     if missing:
@@ -65,9 +66,7 @@ def _require_ollama_extra():
 # ---------------------------------------------------------------------------
 
 DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
-DEFAULT_BASE_URL = os.environ.get(
-    "OLLAMA_BASE_URL", "http://127.0.0.1:11434"
-)
+DEFAULT_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
 SYSTEM_PROMPT = """You are a microscopy operations agent that drives a \
 multimodal (S)TEM column through schema-bound MCP tools. The server is \
@@ -100,8 +99,9 @@ operations, confirm the new value by reading it back.
 # Public API
 # ---------------------------------------------------------------------------
 
+
 async def run_agent(
-    server,                          # FastMCP instance
+    server,  # FastMCP instance
     query: str,
     *,
     model: str = DEFAULT_MODEL,
@@ -149,11 +149,15 @@ async def run_agent(
     tools = await _server_to_langchain_tools(server, verbose=verbose)
 
     llm = ChatOllama(
-        model=model, base_url=base_url, temperature=temperature,
+        model=model,
+        base_url=base_url,
+        temperature=temperature,
     )
 
     agent = create_react_agent(
-        llm, tools, state_modifier=SYSTEM_PROMPT,
+        llm,
+        tools,
+        state_modifier=SYSTEM_PROMPT,
     )
 
     result = await agent.ainvoke(
@@ -171,6 +175,7 @@ async def run_agent(
 # ---------------------------------------------------------------------------
 # Internals
 # ---------------------------------------------------------------------------
+
 
 async def _server_to_langchain_tools(server, *, verbose: bool) -> list:
     """Wrap each FastMCP tool as a LangChain ``StructuredTool``.
@@ -205,10 +210,14 @@ async def _server_to_langchain_tools(server, *, verbose: bool) -> list:
             except Exception:
                 return text
 
-        wrapped.append(StructuredTool.from_function(
-            coroutine=_call, name=name, description=description,
-            args_schema=getattr(tool, "parameters", None),
-        ))
+        wrapped.append(
+            StructuredTool.from_function(
+                coroutine=_call,
+                name=name,
+                description=description,
+                args_schema=getattr(tool, "parameters", None),
+            )
+        )
     return wrapped
 
 
@@ -216,7 +225,9 @@ async def _server_to_langchain_tools(server, *, verbose: bool) -> list:
 # Synchronous façade for one-shot scripts
 # ---------------------------------------------------------------------------
 
+
 def run_agent_sync(server, query: str, **kwargs) -> str:
     """Convenience wrapper for non-async callers."""
     import asyncio
+
     return asyncio.run(run_agent(server, query, **kwargs))

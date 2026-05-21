@@ -51,7 +51,9 @@ def build_server(
     mcp = FastMCP(
         name="nuance_mcp",
         instructions=INSTRUCTIONS_TEMPLATE.format(
-            vendor=adapter.vendor, model=adapter.model, caps=caps,
+            vendor=adapter.vendor,
+            model=adapter.model,
+            caps=caps,
         ),
     )
 

@@ -39,7 +39,7 @@ class JobRecord:
     started_at: float = field(default_factory=time.time)
     last_update: float = field(default_factory=time.time)
     error: Optional[str] = None
-    latest: Any = None              # latest derived payload
+    latest: Any = None  # latest derived payload
     history: list[Any] = field(default_factory=list)
     params: dict[str, Any] = field(default_factory=dict)
 
@@ -82,8 +82,11 @@ class JobRegistry:
         rec.state = JobState.RUNNING
         rec.touch()
         t = threading.Thread(
-            target=target, args=(rec, self._stops[rec.job_id]) + tuple(args),
-            kwargs=kwargs, daemon=True, name=f"livejob-{rec.job_id}",
+            target=target,
+            args=(rec, self._stops[rec.job_id]) + tuple(args),
+            kwargs=kwargs,
+            daemon=True,
+            name=f"livejob-{rec.job_id}",
         )
         self._threads[rec.job_id] = t
         t.start()

@@ -28,18 +28,27 @@ async def main():
 
     banner("Pre-flight stage")
     pos = await call(server, "get_stage_position")
-    for k, v in pos.items(): kv(k, v)
+    for k, v in pos.items():
+        kv(k, v)
 
     banner("Tilt series: -10° → +10° step 5°")
-    out = await call(server, "acquire_tilt_series",
-                     payload={"start_deg": -10.0, "end_deg": 10.0,
-                              "step_deg": 5.0,
-                              "exposure_s": 0.5, "binning": 2})
+    out = await call(
+        server,
+        "acquire_tilt_series",
+        payload={
+            "start_deg": -10.0,
+            "end_deg": 10.0,
+            "step_deg": 5.0,
+            "exposure_s": 0.5,
+            "binning": 2,
+        },
+    )
     kv("response (truncated)", str(out)[:200])
 
     banner("Post-flight stage")
     pos2 = await call(server, "get_stage_position")
-    for k, v in pos2.items(): kv(k, v)
+    for k, v in pos2.items():
+        kv(k, v)
 
 
 if __name__ == "__main__":

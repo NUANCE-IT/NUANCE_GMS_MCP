@@ -44,20 +44,17 @@ from typing import Optional
 
 DEFAULT_SAMPLE_RATE = 16_000
 DEFAULT_MAX_RECORDING_S = 60.0
-DEFAULT_WHISPER_MODEL = os.environ.get(
-    "NUANCE_MCP_WHISPER_MODEL", "base.en"
-)
+DEFAULT_WHISPER_MODEL = os.environ.get("NUANCE_MCP_WHISPER_MODEL", "base.en")
 DEFAULT_WHISPER_DEVICE = os.environ.get(
     "NUANCE_MCP_WHISPER_DEVICE", "auto"
-)   # "auto" | "cpu" | "cuda"
-DEFAULT_WHISPER_LANGUAGE = os.environ.get(
-    "NUANCE_MCP_WHISPER_LANGUAGE", "en"
-)
+)  # "auto" | "cpu" | "cuda"
+DEFAULT_WHISPER_LANGUAGE = os.environ.get("NUANCE_MCP_WHISPER_LANGUAGE", "en")
 
 
 # ---------------------------------------------------------------------------
 # Dependency guards
 # ---------------------------------------------------------------------------
+
 
 class VoiceDependencyError(ImportError):
     """Raised when the ``[voice]`` extra is not installed correctly."""
@@ -66,11 +63,11 @@ class VoiceDependencyError(ImportError):
 def _require_recording_extras():
     missing = []
     try:
-        import sounddevice          # noqa: F401
+        import sounddevice  # noqa: F401
     except ImportError:
         missing.append("sounddevice")
     try:
-        import numpy                # noqa: F401
+        import numpy  # noqa: F401
     except ImportError:
         missing.append("numpy")
     if missing:
@@ -83,7 +80,7 @@ def _require_recording_extras():
 
 def _require_whisper_extras():
     try:
-        import faster_whisper       # noqa: F401
+        import faster_whisper  # noqa: F401
     except ImportError as exc:
         raise VoiceDependencyError(
             "Local transcription requires faster-whisper. "
@@ -94,6 +91,7 @@ def _require_whisper_extras():
 # ---------------------------------------------------------------------------
 # Recording
 # ---------------------------------------------------------------------------
+
 
 def record_push_to_talk(
     *,
@@ -128,13 +126,15 @@ def record_push_to_talk(
         frames.append(indata.copy())
 
     print("  recording … press Enter to stop", flush=True)
-    with sd.InputStream(samplerate=sample_rate, channels=1,
-                        dtype="int16", callback=_on_audio):
+    with sd.InputStream(
+        samplerate=sample_rate, channels=1, dtype="int16", callback=_on_audio
+    ):
         try:
             # Spawn a tiny background thread that reads stdin so we can
             # interrupt the recording without blocking the audio
             # callback. fall back to polling time if stdin isn't a tty.
             import threading
+
             stop_event = threading.Event()
 
             def _waiter():
@@ -176,6 +176,7 @@ def remove_temp_audio_file(path: Path) -> None:
 # Transcription
 # ---------------------------------------------------------------------------
 
+
 class LocalWhisperTranscriber:
     """Lazy-loading wrapper around :mod:`faster_whisper`.
 
@@ -211,7 +212,9 @@ class LocalWhisperTranscriber:
         self.language = language
         self.compute_type = compute_type
         self._model = WhisperModel(
-            model_name, device=device, compute_type=compute_type,
+            model_name,
+            device=device,
+            compute_type=compute_type,
         )
 
     def transcribe_file(self, wav_path) -> str:
@@ -227,6 +230,7 @@ class LocalWhisperTranscriber:
 # ---------------------------------------------------------------------------
 # Speech output
 # ---------------------------------------------------------------------------
+
 
 def speak_text(text: str, *, command: str = "") -> None:
     """Speak ``text`` through the platform-appropriate TTS.
@@ -261,7 +265,7 @@ def speak_text(text: str, *, command: str = "") -> None:
         ps = (
             "Add-Type -AssemblyName System.Speech; "
             "(New-Object System.Speech.Synthesis.SpeechSynthesizer)"
-            f".Speak('{text.replace(chr(39), chr(39)*2)}')"
+            f".Speak('{text.replace(chr(39), chr(39) * 2)}')"
         )
         subprocess.run(["powershell", "-Command", ps], check=False)
         return

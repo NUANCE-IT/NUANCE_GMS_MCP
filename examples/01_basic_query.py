@@ -21,20 +21,20 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     banner("Adapter capabilities")
-    kv("Vendor",  caps["vendor"])
-    kv("Model",   caps["model"])
+    kv("Vendor", caps["vendor"])
+    kv("Model", caps["model"])
     kv("Bridge?", caps["bridge_required"])
     kv("Caps (n)", len(caps["capabilities"]))
     for c in caps["capabilities"]:
-        kv("",       c)
+        kv("", c)
 
     state = await call(server, "get_microscope_state")
     banner("Microscope state")
     kv("High tension (kV)", state.get("high_tension_kV"))
-    kv("Mode",              state.get("mode"))
-    kv("Magnification",     state.get("magnification"))
-    kv("Stage α (deg)",     state.get("stage_alpha_deg"))
-    kv("Stage β (deg)",     state.get("stage_beta_deg"))
+    kv("Mode", state.get("mode"))
+    kv("Magnification", state.get("magnification"))
+    kv("Stage α (deg)", state.get("stage_alpha_deg"))
+    kv("Stage β (deg)", state.get("stage_beta_deg"))
 
 
 if __name__ == "__main__":

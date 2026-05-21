@@ -26,8 +26,11 @@ def _parse() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--adapter", default="simulator")
     p.add_argument("--mode", default=None)
-    p.add_argument("--transcript", required=True,
-                   help="Spoken or typed natural-language stage command.")
+    p.add_argument(
+        "--transcript",
+        required=True,
+        help="Spoken or typed natural-language stage command.",
+    )
     return p.parse_args()
 
 
@@ -37,8 +40,14 @@ def _propose(transcript: str) -> dict:
     t = transcript.lower()
     out: dict[str, float] = {}
     import re
-    for axis, key in [("alpha", "alpha_deg"), ("beta", "beta_deg"),
-                      ("x", "x_um"), ("y", "y_um"), ("z", "z_um")]:
+
+    for axis, key in [
+        ("alpha", "alpha_deg"),
+        ("beta", "beta_deg"),
+        ("x", "x_um"),
+        ("y", "y_um"),
+        ("z", "z_um"),
+    ]:
         m = re.search(rf"{axis}[^-\d]*(-?[\d.]+)", t)
         if m:
             out[key] = float(m.group(1))
@@ -58,7 +67,8 @@ async def main():
     if not proposed:
         print("  could not parse a stage target from transcript; aborting.")
         return
-    for k, v in proposed.items(): kv(k, v)
+    for k, v in proposed.items():
+        kv(k, v)
 
     # Operator confirmation gate
     try:

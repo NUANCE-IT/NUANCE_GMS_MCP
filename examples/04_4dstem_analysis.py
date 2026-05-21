@@ -25,12 +25,18 @@ async def main():
         return
 
     banner("4D-STEM acquisition")
-    ds = await call(server, "acquire_4d_stem",
-                    payload={"scan_x": 32, "scan_y": 32,
-                             "dwell_us": 1000.0,
-                             "camera_length_mm": 300.0,
-                             "convergence_mrad": 10.0})
-    kv("Name",  ds.get("name"))
+    ds = await call(
+        server,
+        "acquire_4d_stem",
+        payload={
+            "scan_x": 32,
+            "scan_y": 32,
+            "dwell_us": 1000.0,
+            "camera_length_mm": 300.0,
+            "convergence_mrad": 10.0,
+        },
+    )
+    kv("Name", ds.get("name"))
     kv("Shape", ds.get("shape"))
     kv("Exposure (s)", ds.get("exposure_s"))
 

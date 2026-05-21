@@ -37,13 +37,15 @@ from .capabilities import Capability
 # Lightweight value objects (not Pydantic — those live in schemas.py)
 # -----------------------------------------------------------------------------
 
+
 @dataclass
 class MicroscopeState:
     """Snapshot of the column. Vendor adapters fill what they know."""
+
     vendor: str
     model: str
     high_tension_kV: Optional[float] = None
-    mode: Optional[str] = None              # "TEM" | "STEM" | "DIFFRACTION" | ...
+    mode: Optional[str] = None  # "TEM" | "STEM" | "DIFFRACTION" | ...
     magnification: Optional[float] = None
     spot_size: Optional[int] = None
     brightness: Optional[float] = None
@@ -65,6 +67,7 @@ class MicroscopeState:
 @dataclass
 class ImageReturn:
     """Generic acquisition payload."""
+
     data: np.ndarray
     name: str
     pixel_size_nm: Optional[float] = None
@@ -76,8 +79,9 @@ class ImageReturn:
 @dataclass
 class SpectrumReturn:
     """1-D spectrum (EELS / EDS)."""
-    counts: np.ndarray                # shape (N,)
-    energy_eV: np.ndarray             # shape (N,) — calibrated x-axis
+
+    counts: np.ndarray  # shape (N,)
+    energy_eV: np.ndarray  # shape (N,) — calibrated x-axis
     name: str
     exposure_s: Optional[float] = None
     dispersion_eV_per_ch: Optional[float] = None
@@ -87,6 +91,7 @@ class SpectrumReturn:
 # -----------------------------------------------------------------------------
 # The abstract adapter
 # -----------------------------------------------------------------------------
+
 
 class CapabilityUnavailable(NotImplementedError):
     """Raised when an adapter is asked to perform an unsupported operation."""
@@ -161,31 +166,48 @@ class MicroscopeAdapter(ABC):
     # ==================================================================
     # Acquisition
     # ==================================================================
-    def acquire_tem(self, exposure_s: float, binning: int, processing: int,
-                    roi: Optional[list[int]]) -> ImageReturn:
+    def acquire_tem(
+        self, exposure_s: float, binning: int, processing: int, roi: Optional[list[int]]
+    ) -> ImageReturn:
         self._require(Capability.TEM)
         raise CapabilityUnavailable("acquire_tem not implemented")
 
-    def acquire_stem(self, width: int, height: int, dwell_us: float,
-                     rotation_deg: float, signals: list[int]) -> ImageReturn:
+    def acquire_stem(
+        self,
+        width: int,
+        height: int,
+        dwell_us: float,
+        rotation_deg: float,
+        signals: list[int],
+    ) -> ImageReturn:
         self._require(Capability.STEM)
         raise CapabilityUnavailable("acquire_stem not implemented")
 
-    def acquire_4d_stem(self, scan_x: int, scan_y: int, dwell_us: float,
-                        camera_length_mm: Optional[float],
-                        convergence_mrad: Optional[float]) -> ImageReturn:
+    def acquire_4d_stem(
+        self,
+        scan_x: int,
+        scan_y: int,
+        dwell_us: float,
+        camera_length_mm: Optional[float],
+        convergence_mrad: Optional[float],
+    ) -> ImageReturn:
         self._require(Capability.FOURD_STEM)
         raise CapabilityUnavailable("acquire_4d_stem not implemented")
 
-    def acquire_eels(self, exposure_s: float, energy_offset_eV: float,
-                     slit_width_eV: float, dispersion_idx: int,
-                     full_vertical_binning: bool) -> SpectrumReturn:
+    def acquire_eels(
+        self,
+        exposure_s: float,
+        energy_offset_eV: float,
+        slit_width_eV: float,
+        dispersion_idx: int,
+        full_vertical_binning: bool,
+    ) -> SpectrumReturn:
         self._require(Capability.EELS)
         raise CapabilityUnavailable("acquire_eels not implemented")
 
-    def acquire_diffraction(self, exposure_s: float,
-                            camera_length_mm: Optional[float],
-                            binning: int) -> ImageReturn:
+    def acquire_diffraction(
+        self, exposure_s: float, camera_length_mm: Optional[float], binning: int
+    ) -> ImageReturn:
         self._require(Capability.DIFFRACTION)
         raise CapabilityUnavailable("acquire_diffraction not implemented")
 

@@ -19,24 +19,39 @@ from __future__ import annotations
 from fastmcp import FastMCP
 
 from ..core import (
-    MicroscopeAdapter, CapabilityUnavailable, Capability,
+    MicroscopeAdapter,
+    CapabilityUnavailable,
+    Capability,
 )
 from ..core.schemas import (
     FrontImageInput,
-    AcquireTEMInput, AcquireSTEMInput, Acquire4DSTEMInput,
-    AcquireEELSInput, AcquireDiffractionInput,
-    SetStageInput, SetBeamInput, SetDetectorInput,
-    SetMagnificationInput, SetImageShiftInput, SetBrightnessInput,
-    ChangeFocusRelativeInput, SetCondenserStigmationInput,
+    AcquireTEMInput,
+    AcquireSTEMInput,
+    Acquire4DSTEMInput,
+    AcquireEELSInput,
+    AcquireDiffractionInput,
+    SetStageInput,
+    SetBeamInput,
+    SetDetectorInput,
+    SetMagnificationInput,
+    SetImageShiftInput,
+    SetBrightnessInput,
+    ChangeFocusRelativeInput,
+    SetCondenserStigmationInput,
     TiltSeriesInput,
-    ImageFilterInput, RadialProfileInput, MaxFFTInput, MaxSpotMapInput,
-    StartLiveProcessingJobInput, LiveProcessingJobQuery,
+    ImageFilterInput,
+    RadialProfileInput,
+    MaxFFTInput,
+    MaxSpotMapInput,
+    StartLiveProcessingJobInput,
+    LiveProcessingJobQuery,
 )
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _image_to_dict(img) -> dict:
     arr = img.data
@@ -45,11 +60,14 @@ def _image_to_dict(img) -> dict:
         "shape": list(arr.shape),
         "dtype": str(arr.dtype),
         "statistics": {
-            "min": float(arr.min()), "max": float(arr.max()),
-            "mean": float(arr.mean()), "std": float(arr.std()),
+            "min": float(arr.min()),
+            "max": float(arr.max()),
+            "mean": float(arr.mean()),
+            "std": float(arr.std()),
         },
         "calibration": {
-            "scale": img.pixel_size_nm, "unit": img.pixel_unit,
+            "scale": img.pixel_size_nm,
+            "unit": img.pixel_unit,
         },
         "exposure_s": img.exposure_s,
         "tags": img.tags,
@@ -62,15 +80,17 @@ def _spectrum_to_dict(spec) -> dict:
         "n_channels": int(spec.counts.size),
         "exposure_s": spec.exposure_s,
         "dispersion_eV_per_ch": spec.dispersion_eV_per_ch,
-        "energy_range_eV": [float(spec.energy_eV.min()),
-                            float(spec.energy_eV.max())],
-        "statistics": {"max": float(spec.counts.max()),
-                       "mean": float(spec.counts.mean())},
+        "energy_range_eV": [float(spec.energy_eV.min()), float(spec.energy_eV.max())],
+        "statistics": {
+            "max": float(spec.counts.max()),
+            "mean": float(spec.counts.mean()),
+        },
         "tags": spec.tags,
     }
 
 
 import functools
+
 
 def _wrap_unsupported(fn):
     """Convert CapabilityUnavailable into a structured tool response.
@@ -78,16 +98,19 @@ def _wrap_unsupported(fn):
     Uses ``functools.wraps`` so FastMCP sees the original signature when it
     parses the function for its JSON schema.
     """
+
     @functools.wraps(fn)
     def inner(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except CapabilityUnavailable as e:
             return {"status": "UNSUPPORTED", "reason": str(e)}
+
     # FastMCP inspects __wrapped__ via functools.wraps to recover the real
     # signature, but it does not unwrap ``*args``/``**kwargs`` in ``inner``.
     # We restore the wrapped function's signature explicitly:
     import inspect
+
     inner.__signature__ = inspect.signature(fn)
     return inner
 
@@ -95,6 +118,7 @@ def _wrap_unsupported(fn):
 # ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
+
 
 def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     """Bind every typed tool on ``mcp`` to ``adapter``."""
@@ -138,8 +162,10 @@ def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     @_wrap_unsupported
     def acquire_tem(payload: AcquireTEMInput) -> dict:
         img = adapter.acquire_tem(
-            exposure_s=payload.exposure_s, binning=payload.binning,
-            processing=payload.processing, roi=payload.roi,
+            exposure_s=payload.exposure_s,
+            binning=payload.binning,
+            processing=payload.processing,
+            roi=payload.roi,
         )
         return _image_to_dict(img)
 
@@ -147,8 +173,10 @@ def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     @_wrap_unsupported
     def acquire_stem(payload: AcquireSTEMInput) -> dict:
         img = adapter.acquire_stem(
-            width=payload.width, height=payload.height,
-            dwell_us=payload.dwell_us, rotation_deg=payload.rotation_deg,
+            width=payload.width,
+            height=payload.height,
+            dwell_us=payload.dwell_us,
+            rotation_deg=payload.rotation_deg,
             signals=payload.signals,
         )
         return _image_to_dict(img)
@@ -157,7 +185,8 @@ def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     @_wrap_unsupported
     def acquire_4d_stem(payload: Acquire4DSTEMInput) -> dict:
         img = adapter.acquire_4d_stem(
-            scan_x=payload.scan_x, scan_y=payload.scan_y,
+            scan_x=payload.scan_x,
+            scan_y=payload.scan_y,
             dwell_us=payload.dwell_us,
             camera_length_mm=payload.camera_length_mm,
             convergence_mrad=payload.convergence_mrad,
@@ -291,7 +320,8 @@ def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     @_wrap_unsupported
     def result_live(payload: LiveProcessingJobQuery) -> dict:
         return adapter.get_live_processing_job_result(
-            payload.job_id, include_data=payload.include_data,
+            payload.job_id,
+            include_data=payload.include_data,
         )
 
     @mcp.tool(name="stop_live_processing_job")
@@ -303,31 +333,26 @@ def register_tools(mcp: FastMCP, adapter: MicroscopeAdapter) -> None:
     # Clients targeting the original GMS-MCP surface keep working.
     _LEGACY = [
         ("get_microscope_state", "gms_get_microscope_state"),
-        ("get_front_image",      "gms_get_front_image"),
-        ("acquire_tem_image",    "gms_acquire_tem_image"),
-        ("acquire_stem",         "gms_acquire_stem"),
-        ("acquire_4d_stem",      "gms_acquire_4d_stem"),
-        ("acquire_eels",         "gms_acquire_eels"),
-        ("acquire_diffraction",  "gms_acquire_diffraction"),
-        ("get_stage_position",   "gms_get_stage_position"),
-        ("set_stage_position",   "gms_set_stage_position"),
-        ("set_beam_parameters",  "gms_set_beam_parameters"),
-        ("configure_detectors",  "gms_configure_detectors"),
-        ("apply_image_filter",   "gms_apply_image_filter"),
+        ("get_front_image", "gms_get_front_image"),
+        ("acquire_tem_image", "gms_acquire_tem_image"),
+        ("acquire_stem", "gms_acquire_stem"),
+        ("acquire_4d_stem", "gms_acquire_4d_stem"),
+        ("acquire_eels", "gms_acquire_eels"),
+        ("acquire_diffraction", "gms_acquire_diffraction"),
+        ("get_stage_position", "gms_get_stage_position"),
+        ("set_stage_position", "gms_set_stage_position"),
+        ("set_beam_parameters", "gms_set_beam_parameters"),
+        ("configure_detectors", "gms_configure_detectors"),
+        ("apply_image_filter", "gms_apply_image_filter"),
         ("compute_radial_profile", "gms_compute_radial_profile"),
-        ("compute_max_fft",      "gms_compute_max_fft"),
-        ("run_4dstem_analysis",  "gms_run_4dstem_analysis"),
-        ("run_4dstem_maximum_spot_mapping",
-            "gms_run_4dstem_maximum_spot_mapping"),
-        ("acquire_tilt_series",  "gms_acquire_tilt_series"),
-        ("start_live_processing_job",
-            "gms_start_live_processing_job"),
-        ("get_live_processing_job_status",
-            "gms_get_live_processing_job_status"),
-        ("get_live_processing_job_result",
-            "gms_get_live_processing_job_result"),
-        ("stop_live_processing_job",
-            "gms_stop_live_processing_job"),
+        ("compute_max_fft", "gms_compute_max_fft"),
+        ("run_4dstem_analysis", "gms_run_4dstem_analysis"),
+        ("run_4dstem_maximum_spot_mapping", "gms_run_4dstem_maximum_spot_mapping"),
+        ("acquire_tilt_series", "gms_acquire_tilt_series"),
+        ("start_live_processing_job", "gms_start_live_processing_job"),
+        ("get_live_processing_job_status", "gms_get_live_processing_job_status"),
+        ("get_live_processing_job_result", "gms_get_live_processing_job_result"),
+        ("stop_live_processing_job", "gms_stop_live_processing_job"),
     ]
     # NB: FastMCP doesn't currently expose an alias API; in production we
     # register each legacy name as a thin wrapper that calls the new tool.

@@ -11,16 +11,21 @@ from __future__ import annotations
 import pytest
 
 from nuance_mcp.core import (
-    MicroscopeAdapter, SimulatorAdapter, Capability, CapabilityUnavailable,
+    MicroscopeAdapter,
+    SimulatorAdapter,
+    Capability,
+    CapabilityUnavailable,
 )
 from nuance_mcp.adapters import (
-    available_adapters, load_adapter,
+    available_adapters,
+    load_adapter,
 )
 
 
 # ---------------------------------------------------------------------------
 # Properties of the ABC
 # ---------------------------------------------------------------------------
+
 
 def test_abc_has_required_abstracts():
     abstracts = MicroscopeAdapter.__abstractmethods__
@@ -49,6 +54,7 @@ def test_every_adapter_declares_vendor_and_capabilities():
 # Live tests against the simulator
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def sim():
     a = SimulatorAdapter(seed=42)
@@ -65,8 +71,7 @@ def test_simulator_state(sim):
 
 
 def test_simulator_acquire_tem(sim):
-    img = sim.acquire_tem(exposure_s=0.5, binning=1,
-                          processing=3, roi=None)
+    img = sim.acquire_tem(exposure_s=0.5, binning=1, processing=3, roi=None)
     assert img.data.ndim == 2
     assert img.name == "SimTEM"
 
@@ -77,16 +82,19 @@ def test_simulator_stage_setter_roundtrip(sim):
 
 
 def test_simulator_eels_spectrum_shape(sim):
-    spec = sim.acquire_eels(exposure_s=0.5, energy_offset_eV=400.0,
-                            slit_width_eV=10.0, dispersion_idx=1,
-                            full_vertical_binning=True)
+    spec = sim.acquire_eels(
+        exposure_s=0.5,
+        energy_offset_eV=400.0,
+        slit_width_eV=10.0,
+        dispersion_idx=1,
+        full_vertical_binning=True,
+    )
     assert spec.counts.shape == spec.energy_eV.shape
     assert spec.dispersion_eV_per_ch == 0.25
 
 
 def test_simulator_live_job_lifecycle(sim):
-    rec = sim.start_live_processing_job(job_type="radial_profile",
-                                         poll_interval_s=0.1)
+    rec = sim.start_live_processing_job(job_type="radial_profile", poll_interval_s=0.1)
     jid = rec["job_id"]
     st = sim.get_live_processing_job_status(jid)
     assert st["state"] in ("running", "result_ready", "pending")

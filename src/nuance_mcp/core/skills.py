@@ -17,7 +17,6 @@ from fastmcp import FastMCP
 
 
 def register_skills(mcp: FastMCP) -> None:
-
     @mcp.prompt(
         name="eels_survey",
         description="Full EELS characterisation: ZLP + core-loss + edge ID.",
@@ -60,8 +59,12 @@ Step 5 — Report
         name="tilt_series_protocol",
         description="Automated tilt series with pre/post quality checks.",
     )
-    def tilt_series(start_deg: str = "-60", end_deg: str = "60",
-                    step_deg: str = "2", save_dir: str = "") -> str:
+    def tilt_series(
+        start_deg: str = "-60",
+        end_deg: str = "60",
+        step_deg: str = "2",
+        save_dir: str = "",
+    ) -> str:
         return f"""Run a tomographic tilt series from {start_deg}° to {end_deg}°
 in {step_deg}° steps.
 
@@ -78,8 +81,9 @@ Step 4 — Post-flight: re-read state; report frame count, mean intensity
         name="4dstem_characterization",
         description="vBF/HAADF + CoM + DPC + (optional) orientation map.",
     )
-    def fourdstem(scan_size: str = "64", material: str = "unknown",
-                  convergence_mrad: str = "10") -> str:
+    def fourdstem(
+        scan_size: str = "64", material: str = "unknown", convergence_mrad: str = "10"
+    ) -> str:
         return f"""Run a 4D-STEM characterisation on {material}.
 
 Step 1 — Verify capabilities: '4dstem' and 'analysis.com_dpc'.
@@ -110,7 +114,7 @@ Step 5 — Report final focus, stigmation, and FFT isotropy estimate.
         description="Survey → HRTEM → FFT → d-spacing extraction.",
     )
     def hrtem(material: str = "unknown", zone_axis: str = "") -> str:
-        return f"""HRTEM survey on {material} (zone axis: {zone_axis or 'any'}).
+        return f"""HRTEM survey on {material} (zone axis: {zone_axis or "any"}).
 
 Step 1 — get_microscope_state.
 Step 2 — acquire_tem at low magnification for context.
@@ -123,8 +127,7 @@ Step 5 — Match against known phases of {material}; report best match.
         name="diffraction_survey",
         description="Diffraction pattern + radial profile + phase ID.",
     )
-    def diffraction(material: str = "unknown",
-                    camera_length_mm: str = "300") -> str:
+    def diffraction(material: str = "unknown", camera_length_mm: str = "300") -> str:
         return f"""Crystallographic survey on {material}.
 
 Step 1 — Verify 'diffraction' capability.
