@@ -1,30 +1,85 @@
-# nuance-mcp
+# NUANCE-MCP 🔬
 
-A library for interfacing with transmission electron microscopes (TEM) via MCP (Model Context Protocol).
+A vendor-agnostic, privacy-preserving Model Context Protocol (MCP) server for multimodal electron microscopy control via local large language models (LLMs).
+
+NUANCE-MCP provides a universal abstraction layer allowing MCP-compatible LLMs (like Claude, OpenAI, or local Ollama instances) to safely orchestrate transmission electron microscopes (TEM) across multiple vendors — running entirely on your institution's hardware with zero cloud dependencies.
+
+## Highlights
+| Capability | Details |
+| --- | --- |
+| **Supported Vendors** | JEOL, Gatan (GMS 3.60 bridge), Hitachi |
+| **LLM backend** | Any MCP client (Claude Desktop, etc.) or Local Ollama |
+| **Voice control** | Optional local push-to-talk + Whisper transcription |
+| **Data handling** | On-site, local-first workflow |
+| **Modalities** | TEM / HRTEM, STEM (HAADF/BF/ABF), 4D-STEM / NBED, EELS, diffraction |
+| **Built-in analysis**| Virtual BF/HAADF, CoM, DPC, radial profiles, max-FFT, filtering, maximum-spot mapping |
+| **Automation** | Stage control, beam/optics control, detector configuration, tilt series, persistent live-processing jobs |
+| **Validation** | Pydantic v2 physical-bound checks on tool inputs |
+| **Simulation** | Physics-plausible DMSimulator for hardware-free development |
+| **License** | MIT |
 
 ## Installation
 
 ```bash
+# Core server only
 pip install nuance-mcp
+
+# With Ollama client support
+pip install "nuance-mcp[ollama]"
+
+# With local voice control (microphone + Whisper transcription)
+pip install "nuance-mcp[voice]"
+
+# Full installation with specific vendor adapters
+pip install "nuance-mcp[ollama,voice,gatan,jeol]"
 ```
 
-## Supported Hardware
+## Quick Start
 
-The package provides adapters for multiple microscope vendors:
+### 1. Connecting to LLMs (Claude Desktop, etc)
+
+You can plug this directly into any MCP-compatible tool like [Claude Desktop](https://claude.ai/download).
+
+Configure your MCP client to spawn the server:
+```json
+{
+  "mcpServers": {
+    "nuance": {
+      "command": "nuance-mcp",
+      "args": ["serve"]
+    }
+  }
+}
+```
+
+### 2. Local Ollama Testing (Simulation Mode)
+
+You can run our built-in simulator with Ollama without touching a real microscope:
+
+```bash
+# Start the interactive microscope agent using Qwen 2.5
+NUANCE_SIMULATE=1 python -m nuance_mcp.cli --agent --model qwen2.5:7b
+```
+
+## Supported Hardware Adapters
+
+NUANCE-MCP solves the vendor fragmentation problem by providing a universal protocol that drops down into vendor-specific adapters:
 
 - **JEOL**: Full support for JEOL JEM-2100F, 2100, 2200FS, 3200FB, 3200, 3400FB, 3400FS, etc.
-- **Gatan**: Bridge adapter for GMS-EELS and DM (Detector Manager) operations
+- **Gatan**: Bridge adapter for GMS-EELS and DM (Detector Manager) operations.
 - **Hitachi**: Adapter for Hitachi 2100, 2200, 2700, 2800, 2100II, 2200II, 2100UP, etc.
 
-## Usage Examples
+## Usage Examples (Python API)
+
+You can also use the typed tools programmatically:
 
 ### JEOL Adapter
 
 ```python
 from nuance_mcp.adapters.jeol import adapter
 
-mcp = FastMCP("JEOL Adapter")
-mcp.add_resource("microscope_state", adapter.get_microscope_state())
+state = adapter.get_microscope_state()
+print(f"Magnification: {state['magnification']}x")
 ```
 
 ### Gatan Bridge Adapter
@@ -32,8 +87,7 @@ mcp.add_resource("microscope_state", adapter.get_microscope_state())
 ```python
 from nuance_mcp.adapters.gatan import adapter
 
-mcp = FastMCP("Gatan Adapter")
-mcp.add_resource("eels_data", adapter.get_eels_data())
+spectrum = adapter.get_eels_data()
 ```
 
 ### Hitachi Adapter
@@ -41,30 +95,21 @@ mcp.add_resource("eels_data", adapter.get_eels_data())
 ```python
 from nuance_mcp.adapters.hitachi import adapter
 
-mcp = FastMCP("Hitachi Adapter")
-mcp.add_resource("stem_image", adapter.acquire_stem())
+image = adapter.acquire_stem()
 ```
 
-## Features
+## Skills (MCP Prompts)
 
-- **Multi-vendor support**: Works with JEOL, Gatan, and Hitachi systems
-- **Image acquisition**: TEM, STEM, 4D-STEM imaging
-- **Spectrum acquisition**: EELS data collection
-- **Diffraction**: SAD/HRTEM patterns
-- **Detector control**: CCD, direct detection cameras
-- **Image processing**: Filters, FFT analysis, spot mapping, DPC
-- **Stage control**: X/Y positioning, tilting series
-- **Live processing**: Job submission and monitoring
+Skills are pre-defined, multi-step experiment protocols exposed as MCP Prompts — a first-class MCP primitive that any MCP-compatible client can discover and invoke by name.
 
-## Supported Capabilities
-
-The following capabilities are supported by JEOL adapters:
-
-- **TEM/STEM**: Conventional and annular dark field imaging
-- **EELS/EDS**: Spectroscopy data acquisition
-- **FFT/DPC**: Fourier transform and differential phase contrast processing
-- **Image filters**: Radial profiles, spot mapping
-- **Live jobs**: Asynchronous data processing
+| Skill | Description |
+| --- | --- |
+| `eels_survey` | Acquire ZLP reference + core-loss spectrum, identify elemental edges |
+| `tilt_series_protocol` | Automated tilt series with pre/post quality checks and per-frame flagging |
+| `4dstem_characterization`| Full 4D-STEM pipeline: virtual BF/HAADF → CoM map → orientation map |
+| `beam_alignment` | Systematic beam centring, stigmation correction, and focus verification |
+| `hrtem_imaging` | Survey → HRTEM → FFT → d-spacing extraction and phase matching |
+| `diffraction_survey` | Acquire diffraction pattern → radial profile → crystal phase identification |
 
 ## Academic Citation
 
