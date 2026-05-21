@@ -21,6 +21,15 @@ this contract; Hitachi is included as a skeleton.
 
 ### Added
 
+- **Project-status tooling.** `scripts/project_status.py` is a live probe
+  that measures the protocol surface (typed tools, skills, live-job types,
+  capabilities) from the running server, runs the test suite, reads git
+  state, and prints an 11-milestone roadmap. It backs a new `/goals`
+  Claude Code slash command (`.claude/commands/goals.md`) and runs as a
+  `Project status probe` step in CI; it exits non-zero on a red suite so
+  the slash command, the command line, and CI share one source of truth.
+  Documented in `docs/project_status.md`; smoke-tested in
+  `tests/test_status.py`.
 - **`nuance_mcp.core.adapter.MicroscopeAdapter`** — abstract base class
   defining every typed operation as a vendor-neutral method.
 - **`nuance_mcp.core.capabilities.Capability`** — 24-entry vocabulary

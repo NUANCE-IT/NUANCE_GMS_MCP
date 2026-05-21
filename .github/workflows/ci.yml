@@ -82,6 +82,15 @@ jobs:
           NUANCE_MCP_JEOL_MODE: offline
         run: pytest tests/ -q -m "not ollama" --cov=nuance_mcp --cov-report=xml
 
+      - name: Project status probe
+        # Shares its source of truth with the /goals slash command:
+        # scripts/project_status.py. --no-tests because the suite already
+        # ran above; this step gates on the protocol surface importing
+        # cleanly and prints the milestone roadmap into the CI log.
+        env:
+          NUANCE_MCP_JEOL_MODE: offline
+        run: python scripts/project_status.py --no-tests
+
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4

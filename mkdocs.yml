@@ -178,6 +178,7 @@ nav:
       - Safety & deployment: safety.md
       - Bridge spec 1.0: spec/nuance-mcp-bridge-1.0.md
   - Contributing:
-      - Add a vendor:   contributing_a_vendor.md
+      - Add a vendor:            contributing_a_vendor.md
+      - Project status & /goals: project_status.md
   - Migration v0.1 → v0.2: migration_v0.1_to_v0.2.md
   - Changelog:        ../CHANGELOG.md

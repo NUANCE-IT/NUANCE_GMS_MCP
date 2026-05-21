@@ -48,6 +48,10 @@ class Capability(str, Enum):
     MAX_SPOT_MAP = "analysis.max_spot_map"
     SCRIPT_TEMPLATE = "analysis.script_template"
 
+    # Image processing
+    FFT = "fft"
+    DPC = "dpc"
+
     # Server-side primitives
     LIVE_JOBS = "live_jobs"
     WORKSPACE = "workspace"

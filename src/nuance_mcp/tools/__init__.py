@@ -7,6 +7,11 @@ surface (tool names, schemas, return wrappers). It depends only on
 Tool names are vendor-neutral by convention (``acquire_tem_image`` rather
 than ``gms_acquire_tem_image``). Legacy ``gms_*`` aliases are registered as
 well so existing client code keeps working through one deprecation cycle.
+
+Usage:
+    From ``nuance_mcp.adapters.gatan``, you can either:
+    - import the bridge adapter: ``from nuance_mcp.adapters.gatan import gms_adapter as gatan_adapter``
+    - or the main adapter: ``from nuance_mcp.adapters.gatan import adapter``
 """
 
 from __future__ import annotations
