@@ -117,31 +117,10 @@ The benchmarks below evaluate **Tool-Calling accuracy** (correct JSON schema/par
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4CAF50', 'primaryBorderColor': '#388E3C', 'secondaryColor': '#2196F3', 'secondaryBorderColor': '#1976D2' }}}%%
 xychart-beta
-    title "LLM Multi-Step Protocol Success Rate vs Latency"
-    x-axis "Latency (seconds) →" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45]
+    title "LLM Multi-step Protocol Success Rate (%)"
+    x-axis ["qwen2.5:14b", "qwen2.5:7b", "gemma(4b)", "llama3.1:8b", "mistral-nemo", "llama3.2:3b"]
     y-axis "Success Rate (%)" 50 --> 100
-    bar [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-```
-*(Note: Mermaid XY Charts are experimental and may vary by markdown renderer. Wait, let's use a simpler comparison chart!)*
-
-```mermaid
-gantt
-    title LLM Multi-step Protocol Success Range
-    dateFormat  X
-    axisFormat %s
-
-    section qwen2.5:14b
-    95% Success Rate : 0, 95
-    section qwen2.5:7b
-    90% Success Rate : 0, 90
-    section gemma (4b)
-    88% Success Rate : 0, 88
-    section llama3.1:8b
-    82% Success Rate : 0, 82
-    section mistral-nemo
-    70% Success Rate : 0, 70
-    section llama3.2:3b
-    58% Success Rate : 0, 58
+    bar [95, 90, 88, 82, 70, 58]
 ```
 
 ## Skills (MCP Prompts)
