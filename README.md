@@ -66,28 +66,35 @@ The following capabilities are supported by JEOL adapters:
 - **Image filters**: Radial profiles, spot mapping
 - **Live jobs**: Asynchronous data processing
 
-## Project status & the `/goals` command
+## Academic Citation
 
-`scripts/project_status.py` is a live status probe. It imports the FastMCP
-server (simulator adapter), measures the protocol surface — typed tools,
-skills, live-job types, capabilities — runs the test suite, reads git
-state, and prints an 11-milestone roadmap with a completion percentage:
+If you use this work or its concepts in your research, please cite our associated preprint:
 
-```bash
-python scripts/project_status.py            # human-readable report
-python scripts/project_status.py --json     # machine-readable
-python scripts/project_status.py --no-tests # skip the pytest run (fast)
+**Title:** Schema-Bound LLM Control of Scientific Instrumentation through Model Context Protocol Skills  
+**Authors:** Roberto dos Reis, Vinayak P. Dravid  
+*(arXiv ID and URL pending)*
+
+```bibtex
+@misc{dosReis2026SchemaBound,
+  title={Schema-Bound LLM Control of Scientific Instrumentation through Model Context Protocol Skills},
+  author={Roberto dos Reis and Vinayak P. Dravid},
+  year={2026},
+  eprint={PENDING},
+  archivePrefix={arXiv}
+}
 ```
 
-It exits non-zero when the suite is red, so it doubles as a CI gate and
-runs as the `Project status probe` step in `.github/workflows/ci.yml`.
+## Intellectual Property Disclosure
 
-`.claude/commands/goals.md` is a [Claude Code](https://docs.claude.com/en/docs/claude-code)
-custom slash command. Inside Claude Code, type `/goals` for the full
-roadmap + live status, `/goals next` for prioritised next steps,
-`/goals status` for a terse summary, or `/goals M1`…`M11` to drill into a
-single milestone. See [`docs/project_status.md`](docs/project_status.md)
-for details.
+This software, schemas, and the associated methodologies for agentic control of scientific instrumentation using the Model Context Protocol (MCP) were developed in whole or in part at Northwestern University. 
+
+This work is the subject of the following Northwestern University Invention Disclosure:
+- **Disclosure Title:** Universal Control Protocol for Scientific Instrumentation Using Extended Model Context Protocol
+- **Invention ID:** Disc-ID-25-05-22-002
+- **Tech ID:** 2025-136
+- **Inventors:** Roberto Moreno Souza dos Reis, Vinayak P. Dravid
+
+Commercialization, licensing inquiries, and related intellectual property matters should be directed to the Innovation and New Ventures Office (INVO) at Northwestern University.
 
 ## License
 
