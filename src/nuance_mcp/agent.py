@@ -157,7 +157,7 @@ async def run_agent(
     agent = create_react_agent(
         llm,
         tools,
-        state_modifier=SYSTEM_PROMPT,
+        prompt=SYSTEM_PROMPT,
     )
 
     result = await agent.ainvoke(
