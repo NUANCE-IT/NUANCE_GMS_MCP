@@ -1,6 +1,6 @@
 """NUANCE-MCP — vendor-agnostic MCP server for multimodal EM."""
 
-__version__ = "0.2.0a1"
+__version__ = "0.2.0"
 
 from .core import (
     MicroscopeAdapter,
