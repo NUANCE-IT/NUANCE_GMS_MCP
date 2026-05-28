@@ -19,9 +19,9 @@ def generate_plot():
     # ==========================================
 
     # Example data mirroring the attached image
-    categories = ["Hardware-\nIndependent", "Bridge\nProtocol", "Ollama\nIntegration"]
-    passes = [92, 13, 12]  # Approximate values
-    fails = [0, 0, 3]  # Approximate values
+    categories = ["Hardware-\nIndependent", "Bridge\nProtocol", "Live-Job\nLifecycle", "Ollama\nIntegration"]
+    passes = [92, 13, 15, 12]  # Approximate values
+    fails = [0, 0, 0, 3]  # Approximate values
 
     width = 0.5
 
