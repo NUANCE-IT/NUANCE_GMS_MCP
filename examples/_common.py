@@ -16,7 +16,6 @@ Run any example with::
 from __future__ import annotations
 
 import argparse
-import asyncio
 import json
 import sys
 from typing import Any
@@ -45,7 +44,7 @@ def make_server(args: argparse.Namespace):
         return build_server(args.adapter, adapter_kwargs=kwargs)
     except Exception as exc:
         print(f"[examples] {args.adapter!r} adapter failed: {exc}", file=sys.stderr)
-        print(f"[examples] falling back to simulator.", file=sys.stderr)
+        print("[examples] falling back to simulator.", file=sys.stderr)
         return build_server("simulator")
 
 

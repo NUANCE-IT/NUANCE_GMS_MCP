@@ -16,12 +16,14 @@ Usage:
 
 from __future__ import annotations
 
+import functools
+
 from fastmcp import FastMCP
 
 from ..core import (
     MicroscopeAdapter,
     CapabilityUnavailable,
-    Capability,
+    Capability as Capability,
 )
 from ..core.schemas import (
     FrontImageInput,
@@ -87,9 +89,6 @@ def _spectrum_to_dict(spec) -> dict:
         },
         "tags": spec.tags,
     }
-
-
-import functools
 
 
 def _wrap_unsupported(fn):

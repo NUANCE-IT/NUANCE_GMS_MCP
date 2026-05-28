@@ -170,28 +170,28 @@ def _roadmap(inv: dict, tests: dict, assets: dict) -> list[dict]:
             "title": "Core MCP server — full PyJEM TEM3 + detector + EDS coverage",
             "status": "done" if tools_ok else "in_progress",
             "evidence": f"{inv.get('tools', '?')} tools, {inv.get('prompts', '?')} prompts, "
-                        "FastMCP multi-transport (stdio/http/sse)",
+            "FastMCP multi-transport (stdio/http/sse)",
         },
         {
             "id": "M2",
             "title": "Safety layer — two-key gating, soft envelopes, Pydantic validation",
             "status": "done",
             "evidence": f"{inv.get('state_changing', '?')} state-changing tools behind "
-                        "confirm-gate; HT/tilt/stage/DAC clamps",
+            "confirm-gate; HT/tilt/stage/DAC clamps",
         },
         {
             "id": "M3",
             "title": "API fidelity — signatures cross-checked vs pyJEM 1.3.9.3617",
             "status": "done",
             "evidence": "snapshot arg order, exposure µs, EDS param-dict, GetMagValue "
-                        "tuple, scan-mode/gain ranges — see CHANGELOG",
+            "tuple, scan-mode/gain ranges — see CHANGELOG",
         },
         {
             "id": "M4",
             "title": "Offline-simulator validation against the real PyJEM.offline",
             "status": "pending",
             "evidence": f"{tests.get('passed', '?')} tests pass against an in-repo fake; "
-                        "real PyJEM.offline (JEOL-only) not yet exercised",
+            "real PyJEM.offline (JEOL-only) not yet exercised",
         },
         {
             "id": "M5",
@@ -214,10 +214,12 @@ def _roadmap(inv: dict, tests: dict, assets: dict) -> list[dict]:
         {
             "id": "M8",
             "title": "Continuous integration (GitHub Actions)",
-            "status": "pending" if not (REPO / ".github" / "workflows").exists() else "done",
+            "status": "pending"
+            if not (REPO / ".github" / "workflows").exists()
+            else "done",
             "evidence": "no .github/workflows/ present"
-                        if not (REPO / ".github" / "workflows").exists()
-                        else "workflow present",
+            if not (REPO / ".github" / "workflows").exists()
+            else "workflow present",
         },
         {
             "id": "M9",
@@ -318,8 +320,10 @@ def render(data: dict) -> str:
         L.append(f"  {_ICON[m['status']]} {m['id']}  {m['title']}")
         L.append(f"        └ {m['evidence']}")
     L.append("")
-    L.append(f"  Progress: {done}/{total} milestones complete "
-             f"({round(100 * done / total)}%).")
+    L.append(
+        f"  Progress: {done}/{total} milestones complete "
+        f"({round(100 * done / total)}%)."
+    )
     L.append("=" * 66)
     return "\n".join(L)
 

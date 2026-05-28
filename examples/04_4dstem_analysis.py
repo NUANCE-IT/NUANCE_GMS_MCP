@@ -21,7 +21,7 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     if "4dstem" not in caps["capabilities"]:
-        print(f"This adapter does not advertise 4D-STEM.")
+        print("This adapter does not advertise 4D-STEM.")
         return
 
     banner("4D-STEM acquisition")

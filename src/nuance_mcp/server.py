@@ -15,14 +15,13 @@ and starts the chosen MCP transport.
 
 from __future__ import annotations
 
-import os
 from typing import Optional
 
 from fastmcp import FastMCP
 
 from .core import register_skills, MicroscopeAdapter
 from .tools import register_tools
-from .adapters import load_adapter, available_adapters
+from .adapters import load_adapter
 
 
 INSTRUCTIONS_TEMPLATE = """\

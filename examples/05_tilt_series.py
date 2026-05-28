@@ -23,7 +23,7 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     if "tilt_series" not in caps["capabilities"]:
-        print(f"This adapter does not advertise tilt-series acquisition.")
+        print("This adapter does not advertise tilt-series acquisition.")
         return
 
     banner("Pre-flight stage")

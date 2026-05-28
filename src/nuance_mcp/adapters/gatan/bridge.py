@@ -12,14 +12,10 @@ from __future__ import annotations
 
 import asyncio
 import base64
-import json
 import os
-import socket
-import struct
 import sys
-import threading
 import time
-from dataclasses import dataclass, field
+import zmq
 from typing import Any, Callable, Optional
 
 import numpy as np
@@ -27,14 +23,9 @@ import numpy as np
 import gms
 from gms.dm import DM
 from gms.dmsource import ImageDataSource, SpecimenSource
-from gms.image import Image
 from gms.menlow import Menlow
-from gms.spider import Spider
-from gms.stm import STM
 
 # Import internal schema helpers (these are not exposed in the public API)
-from nuance_mcp.core.schemas import AcquisitionJobStatus
-from nuance_mcp.core.schemas import DerivedAnalysisResult
 
 # Type aliases for the wire envelope
 JsonDict = dict[str, Any]
@@ -80,7 +71,8 @@ class BridgeServer:
     # --------------------------------------------------------------------------
     @classmethod
     def _set_metadata(cls) -> None:
-        """Read GMS version and model name at import time."""
+        """Read GMS version and model name at import time
+        import zmq."""
         try:
             cls.model = f"GMS {gms.__version__}"
         except Exception:
@@ -148,11 +140,11 @@ class BridgeServer:
     # --------------------------------------------------------------------------
     async def _run(self) -> None:
         """Main message pump."""
-        while not self._stop_event.is_set():
+        while self._stop_event and not self._stop_event.is_set():
             try:
                 message = self.socket.recv_json()
                 response = await asyncio.get_event_loop().run_in_executor(
-                    None, self._handle_message, message
+                    None, self._handle_message, message  # type: ignore
                 )
                 self.socket.send_json(response)
             except zmq.Again:
@@ -629,7 +621,7 @@ class BridgeServer:
         """Acquire a tilt series."""
         try:
             dm = DM.Instance()
-            source = SpecimenSource.Instance()
+            SpecimenSource.Instance()
 
             # Build the tilt series
             images = []
@@ -753,8 +745,8 @@ class BridgeServer:
 
             # Build the filter parameters
             if filter_type == "gaussian":
-                sigma = params.get("sigma", 1.0)
-                result = np.zeros_like(image.get("data"))
+                params.get("sigma", 1.0)
+                np.zeros_like(image.get("data"))
                 # In a real implementation, convolve the image with a Gaussian kernel
                 return self._ok(
                     {
@@ -779,7 +771,7 @@ class BridgeServer:
     def _compute_radial_profile(self, params: dict) -> JsonMessage:
         """Compute a radial profile."""
         try:
-            image = params.get("image", {})
+            params.get("image", {})
             center = params.get("center", [512, 512])
 
             # Compute the radial profile
@@ -813,7 +805,7 @@ class BridgeServer:
     def _run_4dstem_analysis(self, params: dict) -> JsonMessage:
         """Run a 4D STEM analysis."""
         try:
-            dataset = params.get("dataset", {})
+            params.get("dataset", {})
             method = params.get("method", "com_dpc")
 
             # Run the analysis
@@ -846,8 +838,8 @@ class BridgeServer:
     def _run_script_template(self, params: dict) -> JsonMessage:
         """Run a script template."""
         try:
-            template = params.get("template", "")
-            params_ = params.get("params", {})
+            params.get("template", "")
+            params.get("params", {})
 
             # Execute the template
             result = {
@@ -875,8 +867,8 @@ class BridgeServer:
         dm: DM,
         source: ImageDataSource,
         name: str,
-        include_data: bool,
-        include_tags: bool,
+        include_data: bool = True,
+        include_tags: bool = True,
         **kwargs: Any,
     ) -> JsonMessage:
         """Fetch an image from a GMS source."""

@@ -21,7 +21,7 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     if "diffraction" not in caps["capabilities"]:
-        print(f"This adapter does not advertise diffraction.")
+        print("This adapter does not advertise diffraction.")
         return
 
     banner("Diffraction pattern")

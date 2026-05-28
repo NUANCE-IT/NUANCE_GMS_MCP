@@ -18,14 +18,13 @@ typically fall back to :class:`SimulatorAdapter` in that case.
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import Optional, Any
 
 from ...core.adapter import (
     MicroscopeAdapter,
     MicroscopeState,
     ImageReturn,
     SpectrumReturn,
-    CapabilityUnavailable,
 )
 from ...core.capabilities import Capability
 
@@ -81,9 +80,9 @@ class GatanGMSAdapter(MicroscopeAdapter):
             "GMS_MCP_ZMQ", "tcp://127.0.0.1:5555"
         )
         self._timeout_ms = timeout_ms
-        self._zmq = None  # lazy: only imported in bridge mode
-        self._sock = None
-        self._dm = None  # populated in direct mode
+        self._zmq: Any = None  # lazy: only imported in bridge mode
+        self._sock: Any = None
+        self._dm: Any = None  # populated in direct mode
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -293,7 +292,8 @@ class GatanGMSAdapter(MicroscopeAdapter):
 
 def _result_to_image(r: dict) -> ImageReturn:
     """Convert the bridge's image dict back into an :class:`ImageReturn`."""
-    import base64, numpy as np
+    import base64
+    import numpy as np
 
     if "data_b64" in r:
         raw = base64.b64decode(r["data_b64"])
@@ -311,7 +311,8 @@ def _result_to_image(r: dict) -> ImageReturn:
 
 
 def _result_to_spectrum(r: dict) -> SpectrumReturn:
-    import base64, numpy as np
+    import base64
+    import numpy as np
 
     if "counts_b64" in r:
         raw = base64.b64decode(r["counts_b64"])

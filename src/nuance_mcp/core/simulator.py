@@ -21,7 +21,6 @@ from .adapter import (
     MicroscopeState,
     ImageReturn,
     SpectrumReturn,
-    CapabilityUnavailable,
 )
 from .capabilities import Capability
 from .lifecycle import JobRegistry, JobState
@@ -155,8 +154,8 @@ class SimulatorAdapter(MicroscopeAdapter):
     def acquire_tem(self, exposure_s, binning, processing, roi) -> ImageReturn:
         arr = self._new_hrtem()
         if roi is not None:
-            t, l, b, r = roi
-            arr = arr[t:b, l:r]
+            top, left, bottom, right = roi
+            arr = arr[top:bottom, left:right]
         img = ImageReturn(
             data=arr,
             name="SimTEM",

@@ -31,8 +31,8 @@ def _validate_roi(v: Optional[list[int]]) -> Optional[list[int]]:
         return None
     if len(v) != 4:
         raise ValueError("roi must have exactly 4 elements: [top, left, bottom, right]")
-    t, l, b, r = v
-    if t < 0 or l < 0 or b <= t or r <= l:
+    top, left, bottom, right = v
+    if top < 0 or left < 0 or bottom <= top or right <= left:
         raise ValueError("roi must define a positive [top, left, bottom, right] region")
     return v
 

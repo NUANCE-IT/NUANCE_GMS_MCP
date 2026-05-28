@@ -26,7 +26,6 @@ extra raises ``AgentDependencyError`` with a clear remediation hint.
 from __future__ import annotations
 
 import os
-from typing import Any, Optional
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +138,6 @@ async def run_agent(
     _require_ollama_extra()
 
     from langchain_ollama import ChatOllama
-    from langchain_mcp_adapters.client import MultiServerMCPClient
     from langgraph.prebuilt import create_react_agent
 
     # Expose the in-process FastMCP server through the LangChain MCP

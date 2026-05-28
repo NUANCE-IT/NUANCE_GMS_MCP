@@ -20,7 +20,7 @@ async def main():
 
     caps = await call(server, "get_capabilities")
     if "eels" not in caps["capabilities"]:
-        print(f"This adapter does not advertise EELS.")
+        print("This adapter does not advertise EELS.")
         return
 
     banner("ZLP reference")
