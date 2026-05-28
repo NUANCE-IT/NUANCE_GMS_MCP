@@ -7,7 +7,7 @@ format is loosely based on [Keep a Changelog]; releases follow
 [Keep a Changelog]: https://keepachangelog.com/en/1.1.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-## 0.2.0a1 — May 2026 (unreleased)
+## 0.2.0 — May 2026
 
 ### Highlights
 

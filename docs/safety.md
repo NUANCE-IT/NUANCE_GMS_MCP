@@ -82,7 +82,7 @@ result = await server.call_tool("set_stage_position",
 ```
 
 This pattern is shown explicitly in
-[`examples/08_voice_confirmed_stage_moves.py`](../examples/08_voice_confirmed_stage_moves.py).
+[`examples/08_voice_confirmed_stage_moves.py`](https://github.com/NUANCE-IT/nuance-mcp/blob/main/examples/08_voice_confirmed_stage_moves.py).
 The confirmation step is **not** part of the protocol; the protocol
 ensures that *if* a move is dispatched, its arguments are in-range.
 Whether to require confirmation, and for which operations, is a

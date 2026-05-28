@@ -28,7 +28,7 @@ not need to be modified.
    After `pip install thermo-nuance-mcp`, the adapter is
    discoverable as `nuance-mcp --adapter thermo`.
 6. **Add structural tests.** Reuse
-   [`tests/test_adapter_contract.py`](../tests/test_adapter_contract.py)
+   [`tests/test_adapter_contract.py`](https://github.com/NUANCE-IT/nuance-mcp/blob/main/tests/test_adapter_contract.py)
    as a template; the structural assertions there apply to every
    adapter. Live-hardware tests can be gated behind an environment
    variable.

@@ -99,7 +99,7 @@ python examples/08_voice_confirmed_stage_moves.py --adapter gatan \
 ## Next
 
 - [Architecture](architecture.md) — the four-layer design.
-- [Adapters](adapters/) — adapter-specific docs (Gatan, JEOL, Hitachi).
+- Adapters — adapter-specific docs (Gatan, JEOL, Hitachi).
 - [Tool reference](tools_reference.md) — all 30 typed tools.
 - [Safety and deployment](safety.md) — bounded execution vs facility safety.
 - [Contributing a new vendor adapter](contributing_a_vendor.md).
