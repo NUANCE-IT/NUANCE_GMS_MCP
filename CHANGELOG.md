@@ -12,9 +12,9 @@ format is loosely based on [Keep a Changelog]; releases follow
 ### Highlights
 
 This release **renames the package from `nuance-gms-mcp` / `jeol-mcp` to
-`nuance-mcp`** and reorganises the codebase as a vendor-agnostic
+`nuance-mcp`** and reorganizes the codebase as a vendor-agnostic
 framework with pluggable adapters. The schema-bound tool layer, persistent
-live-job lifecycle, declarative skill catalogue, and physics-plausible
+live-job lifecycle, declarative skill catalog, and physics-plausible
 simulator now sit above an explicit `MicroscopeAdapter` contract. The two
 v0.1 codebases — Gatan/GMS and JEOL/PyJEM — become reference adapters under
 this contract; Hitachi is included as a skeleton.

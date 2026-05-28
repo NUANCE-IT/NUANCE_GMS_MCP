@@ -51,7 +51,7 @@ Step 4 — Acquire core-loss spectrum at {loss} eV
   Identify peaks above 3σ.
 
 Step 5 — Report
-  Summarise ZLP FWHM, core-loss range, detected edges, tentative element
+  Summarize ZLP FWHM, core-loss range, detected edges, tentative element
   assignments for {material}, recommended next step.
 """
 

@@ -1,7 +1,7 @@
 """Vendor-agnostic capability vocabulary.
 
 Each :class:`Capability` represents a *family* of operations that an adapter
-may declare. The schema layer never inspects vendor-specific behaviour; it
+may declare. The schema layer never inspects vendor-specific behavior; it
 only checks ``capability in adapter.capabilities`` before dispatching a tool
 that requires that family.
 

@@ -33,7 +33,7 @@ not need to be modified.
    adapter. Live-hardware tests can be gated behind an environment
    variable.
 7. **Add a docs page** under `docs/adapters/<name>.md` covering the
-   declared capabilities, installation, online/offline behaviour,
+   declared capabilities, installation, online/offline behavior,
    and any vendor-specific caveats.
 
 ## Minimal example

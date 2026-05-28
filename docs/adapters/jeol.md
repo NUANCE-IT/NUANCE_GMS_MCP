@@ -3,7 +3,7 @@
 The JEOL adapter wraps JEOL's PyJEM/TEM3 Python interface. Unlike the
 Gatan adapter it does **not** require a separate bridge: PyJEM loads
 inside the JEOL TEMcenter Python interpreter and provides a
-behaviourally identical `PyJEM.offline` simulator that is safe to
+behaviorally identical `PyJEM.offline` simulator that is safe to
 import anywhere.
 
 ## Why no bridge?
@@ -100,4 +100,4 @@ helpers from `jeol_mcp.tools.*` (Stage, EOS, HT, Lens, GUN, FEG,
 Filter, Apt, Def, MDS, Nitrogen, Vacuum, Camera, Scan, Detector3,
 EDS) are folded into private modules under
 `nuance_mcp/adapters/jeol/_tem3/` during migration; their
-behaviour is unchanged.
+behavior is unchanged.

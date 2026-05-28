@@ -62,7 +62,7 @@ Step 2 — Verify instrument state
 Step 3..N — Tool sequence with explicit arguments
 
 Step (last) — Report
-  Summarise results, recommend next step.
+  Summarize results, recommend next step.
 ```
 
 This shape is what makes skills auditable: the agent's trace becomes

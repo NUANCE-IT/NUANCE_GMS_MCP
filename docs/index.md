@@ -6,7 +6,7 @@
 
 A **vendor-agnostic, schema-bound Model Context Protocol server** for local
 LLM-orchestrated multimodal electron microscopy. The schema-bound tool
-layer, persistent live-job lifecycle, declarative skill catalogue, and
+layer, persistent live-job lifecycle, declarative skill catalog, and
 physics-plausible simulator sit above an explicit
 [`MicroscopeAdapter`](architecture.md) contract. Reference adapters for
 **Gatan**, **JEOL**, and a **Hitachi** skeleton ship in the same
@@ -59,7 +59,7 @@ package, alongside a hardware-free simulator backend.
 
 | Page                                                                                  | What's in it                                          |
 |---------------------------------------------------------------------------------------|-------------------------------------------------------|
-| [All 30 tools](tools_reference.md)                                                    | Every typed tool with bounds and behaviour            |
+| [All 30 tools](tools_reference.md)                                                    | Every typed tool with bounds and behavior            |
 | [Skills](skills.md)                                                                   | Six MCP prompts; anatomy and how to add your own       |
 | [Bridge spec 1.0](spec/nuance-mcp-bridge-1.0.md)                                      | Versioned JSON wire protocol                          |
 | [Contributing a vendor adapter](contributing_a_vendor.md)                             | Checklist and minimal example                         |

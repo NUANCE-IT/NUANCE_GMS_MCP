@@ -22,7 +22,7 @@ and operational bounds:
 | ROI                     | 4-element, monotone, in-image      |
 
 Out-of-bound requests fail at the boundary with a structured
-`ValidationError` and **never reach the instrument**. The behaviour
+`ValidationError` and **never reach the instrument**. The behavior
 is independent of how the calling agent phrased the request.
 
 This is a useful property — but it is *not* facility safety.
